@@ -1,0 +1,8 @@
+git
+workflow-aggregator:2.2
+cloudbees-credentials:3.3
+tap:2.0.1
+matrix-auth:1.5
+mask-passwords:2.8
+credentials-binding:1.8
+credentials:2.1.13

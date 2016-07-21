@@ -1,0 +1,34 @@
+FROM jenkins/jenkins:2.71
+USER root
+RUN apt-get update && \
+    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip && \
+    pip install --upgrade pip && \
+    pip install --upgrade awscli
+
+RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
+RUN groupadd docker && gpasswd -a jenkins docker
+ADD ./install_docker.sh /tmp
+
+ARG CACHEBUST=1
+
+RUN chmod +x /tmp/install_docker.sh && \
+    cd /tmp && \
+    ./install_docker.sh
+
+USER jenkins
+
+
+
+ADD ./build/plugins.txt /tmp/plugins.txt
+RUN /usr/local/bin/install-plugins.sh < /tmp/plugins.txt
+
+ENV JENKINS_USER admin
+ENV JENKINS_PASS admin
+
+# Skip initial setup
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+
+COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
+COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
+
+#VOLUME /var/jenkins_home

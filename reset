@@ -1,0 +1,2 @@
+docker-compose kill jenkins && docker-compose rm -f jenkins
+./up
