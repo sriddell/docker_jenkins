@@ -23,7 +23,7 @@ def waitForBuild(job, branch):
     if buildId == None:
         return None
     status = -1
-    count = 300
+    count = 900
     while status != 200 and count >= 0:
         count = count - 1
         resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/api/json")
@@ -152,6 +152,14 @@ instance.save()
     if r.status_code != 200:
         raise Exception("Failed to clear all env vars; status was " + str(r.status_code))
 
+def addSecuritySignature(sig):
+    thisDir = os.path.dirname(os.path.abspath(__file__))
+    j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
+    script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
+    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
+    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
+    if r.status_code != 200:
+        raise Exception("Failed to clear all env vars; status was " + str(r.status_code))
 def clearAll():
     clearEnvVars()
     clearAllJobs()

@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.71
+FROM 434313288222.dkr.ecr.us-east-1.amazonaws.com/prod/docker-jenkins-fork:0.1.0
 USER root
 RUN apt-get update && \
     apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip && \
@@ -6,7 +6,7 @@ RUN apt-get update && \
     pip install --upgrade awscli
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
-RUN groupadd docker && gpasswd -a jenkins docker
+RUN groupadd docker
 ADD ./install_docker.sh /tmp
 
 ARG CACHEBUST=1
@@ -15,10 +15,12 @@ RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
     ./install_docker.sh
 
+RUN touch /var/run/docker.sock
+RUN chown root:docker /var/run/docker.sock
+RUN adduser jenkins docker
+RUN adduser jenkins users
+
 USER jenkins
-
-
-
 ADD ./build/plugins.txt /tmp/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /tmp/plugins.txt
 
@@ -31,4 +33,5 @@ ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
 COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
 
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.25.3/install.sh | bash
 #VOLUME /var/jenkins_home
