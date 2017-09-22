@@ -1,7 +1,7 @@
 FROM 434313288222.dkr.ecr.us-east-1.amazonaws.com/prod/docker-jenkins-fork:0.1.0
 USER root
 RUN apt-get update && \
-    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip && \
+    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime && \
     pip install --upgrade pip && \
     pip install --upgrade awscli
 
