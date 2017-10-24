@@ -1,5 +1,6 @@
-FROM 434313288222.dkr.ecr.us-east-1.amazonaws.com/prod/docker-jenkins-fork:0.3.0
+FROM jenkins:2.7.4
 USER root
+
 RUN apt-get update && \
     apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime && \
     pip install --upgrade pip && \
@@ -7,31 +8,48 @@ RUN apt-get update && \
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
 RUN groupadd docker
-ADD ./install_docker.sh /tmp
 
 ARG CACHEBUST=1
 
+ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
     ./install_docker.sh
-
 RUN touch /var/run/docker.sock
 RUN chown root:docker /var/run/docker.sock
+
+#The install-plugins.sh in the base image appears to have bugs, replacing it with a working one
+COPY ./templates/install-plugins.sh /usr/local/bin/install-plugins.sh
+RUN chmod +x /usr/local/bin/install-plugins.sh
+
+#We can't install plugins as part of the docker build, because it affects the jenkins home, which is a VOLUME in the parent image
+#so downstream builds can't modify it.  So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
+#installs the plugins at startup, then invokes the original startup script.
+RUN mv /usr/local/bin/jenkins.sh /usr/local/bin/jenkins_orig.sh
+COPY ./templates/startup.sh /usr/local/bin/jenkins.sh
+RUN chmod +x /usr/local/bin/jenkins.sh
+
+#Put jenkins in needed groups to access docker
 RUN adduser jenkins docker
 RUN adduser jenkins users
 
+#Switch back to jenkins user and store the plugins
 USER jenkins
-ADD ./build/plugins.txt /tmp/plugins.txt
-RUN /usr/local/bin/install-plugins.sh < /tmp/plugins.txt
+COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
+#Set username, password, and updates URL
 ENV JENKINS_USER admin
 ENV JENKINS_PASS admin
+ENV JENKINS_UC https://updates.jenkins.io
 
 # Skip initial setup
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 
+#Add bootstrapping scripts
 COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
 COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
 
+#Install nvm
 RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.25.3/install.sh | bash
 #VOLUME /var/jenkins_home
+
