@@ -30,7 +30,7 @@ def waitForBuild(job, branch):
         status = resp.status_code
         if status == 200:
             j = json.loads(resp.text)
-            if j['result'] != None and len(j['result'].strip()) > 0:
+            if j['building'] == False:
                 return j
             else:
                 status = -1
