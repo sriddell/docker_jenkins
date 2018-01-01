@@ -159,7 +159,8 @@ def addSecuritySignature(sig):
     headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
     r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
     if r.status_code != 200:
-        raise Exception("Failed to clear all env vars; status was " + str(r.status_code))
+        raise Exception("Failed to add security signatures; status was " + str(r.status_code))
+
 def clearAll():
     clearEnvVars()
     clearAllJobs()

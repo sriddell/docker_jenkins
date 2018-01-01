@@ -1,8 +1,8 @@
-FROM jenkins:2.7.4
+FROM jenkins/jenkins:2.73.3
 USER root
 
 RUN apt-get update && \
-    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime && \
+    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync && \
     pip install --upgrade pip && \
     pip install --upgrade awscli
 
