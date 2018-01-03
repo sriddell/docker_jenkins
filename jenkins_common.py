@@ -37,6 +37,13 @@ def waitForBuild(job, branch):
                 time.sleep(1)
     return None
 
+def getConsole(job, branch, buildId):
+    resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console")
+    if resp.status_code == 200:
+        return resp.text
+    else:
+        raise Exception("Failed to retrieve console " + str(resp.status_code))
+
 def getArtifact(job, branch, buildId, relativePath):
     print(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)
     resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)

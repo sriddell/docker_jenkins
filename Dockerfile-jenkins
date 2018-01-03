@@ -2,7 +2,7 @@ FROM jenkins/jenkins:2.73.3
 USER root
 
 RUN apt-get update && \
-    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync && \
+    apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
     pip install --upgrade pip && \
     pip install --upgrade awscli
 
@@ -22,8 +22,9 @@ RUN chown root:docker /var/run/docker.sock
 COPY ./templates/install-plugins.sh /usr/local/bin/install-plugins.sh
 RUN chmod +x /usr/local/bin/install-plugins.sh
 
-#We can't install plugins as part of the docker build, because it affects the jenkins home, which is a VOLUME in the parent image
-#so downstream builds can't modify it.  So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
+#We can't install plugins or anything in jenkins home as part of the docker build, because it affects the jenkins home,
+# which is a VOLUME in the parent image so downstream builds can't modify it.
+# So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
 #installs the plugins at startup, then invokes the original startup script.
 RUN mv /usr/local/bin/jenkins.sh /usr/local/bin/jenkins_orig.sh
 COPY ./templates/startup.sh /usr/local/bin/jenkins.sh
@@ -49,7 +50,4 @@ ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
 COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
 
-#Install nvm
-RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.25.3/install.sh | bash
-#VOLUME /var/jenkins_home
 

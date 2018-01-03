@@ -50,3 +50,6 @@ def getGitInfo():
 
 def jenkinsUrl():
     return "http://admin:admin@" + getDockerHostAddr() + ":" + getContainerPort("jenkins", 8080) + "/"
+
+def verdaccioUrl():
+    return "http://" + getDockerHostAddr() + ":" + getContainerPort("verdaccio", 4873)

@@ -47,7 +47,9 @@ def checkHealth(service, port="3000", path="/health"):
 
 def execute(command = []):
     print(command)
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
+    process = subprocess.Popen(command, cwd=dir_path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     # Poll process for new output until finished
     while True:
@@ -65,8 +67,7 @@ def execute(command = []):
     else:
         raise subprocess.ProcessException(command, exitCode, output)
 
-#subprocess.check_call(["docker-compose", "up", "-d", "--build"])
-#execute("docker-compose build --no-cache")
+# main cmd options
 if not os.path.exists('build'):
     os.makedirs('build')
 if os.path.exists("../plugins.txt"):
@@ -74,10 +75,21 @@ if os.path.exists("../plugins.txt"):
 else:
     with open("build/plugins.txt", 'a'):
         os.utime("build/plugins.txt", None)
-cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " jenkins"
-execute(cmd)
-execute("docker-compose up -d")
+
+def reset_verdaccio():
+    execute("docker-compose kill verdaccio")
+    execute("docker-compose rm -f verdaccio")
+    execute("docker-compose up -d verdaccio")
+if len(sys.argv) > 1:
+    if sys.argv[1] == 'all':
+        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " jenkins"
+        execute(cmd)
+        execute("docker-compose up -d")
+    if sys.argv[1] == 'reset-verdaccio':
+        reset_verdaccio()
+
 
 checkHealth("gitlab", "80", "")
 checkHealth("jenkins", "8080", "")
+checkHealth("verdaccio", "4873", "")
 

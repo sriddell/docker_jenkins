@@ -25,3 +25,10 @@ services:
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
 
+  verdaccio:
+    build:
+      context: .
+      dockerfile: Dockerfile-verdaccio
+    ports:
+      - '4873:4873'
+
