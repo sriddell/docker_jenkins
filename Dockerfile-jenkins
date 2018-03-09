@@ -34,8 +34,15 @@ RUN chmod +x /usr/local/bin/jenkins.sh
 RUN adduser jenkins docker
 RUN adduser jenkins users
 
+COPY ./jenkins/artifactory_plugin.xml /tmp/artifactory_plugin.xml
+ARG DOCKER_HOST_ADDR
+RUN echo $DOCKER_HOST_ADDR
+RUN sed -i "s/DOCKER_HOST_ADDR/$DOCKER_HOST_ADDR/g" /tmp/artifactory_plugin.xml
+RUN chown jenkins:jenkins /tmp/artifactory_plugin.xml
+
 #Switch back to jenkins user and store the plugins
 USER jenkins
+RUN mkdir /var/jenkins_home/workspace
 COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 #Set username, password, and updates URL
@@ -46,8 +53,9 @@ ENV JENKINS_UC https://updates.jenkins.io
 # Skip initial setup
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 
-#Add bootstrapping scripts
+#Add bootstrapping scripts and configuration
 COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
 COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
+
 
 

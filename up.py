@@ -80,16 +80,21 @@ def reset_verdaccio():
     execute("docker-compose kill verdaccio")
     execute("docker-compose rm -f verdaccio")
     execute("docker-compose up -d verdaccio")
+
 if len(sys.argv) > 1:
     if sys.argv[1] == 'all':
-        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " jenkins"
+        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(DOCKER_HOST_ADDR) + " jenkins"
         execute(cmd)
         execute("docker-compose up -d")
     if sys.argv[1] == 'reset-verdaccio':
         reset_verdaccio()
 
 
-checkHealth("gitlab", "80", "")
 checkHealth("jenkins", "8080", "")
 checkHealth("verdaccio", "4873", "")
+checkHealth("artifactory", "8081", "")
+checkHealth("gitlab", "80", "")
+
+
+
 
