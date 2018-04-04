@@ -80,6 +80,13 @@ def reset_verdaccio():
     execute("docker-compose kill verdaccio")
     execute("docker-compose rm -f verdaccio")
     execute("docker-compose up -d verdaccio")
+    checkHealth("verdaccio", "4873", "")
+
+def reset_s3():
+    execute("docker-compose kill s3")
+    execute("docker-compose rm -f s3")
+    execute("docker-compose up -d s3")
+    checkHealth("s3", "80", "")
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'all':
@@ -94,6 +101,7 @@ checkHealth("jenkins", "8080", "")
 checkHealth("verdaccio", "4873", "")
 checkHealth("artifactory", "8081", "")
 checkHealth("gitlab", "80", "")
+checkHealth("s3", "80", "")
 
 
 

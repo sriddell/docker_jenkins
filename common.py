@@ -53,3 +53,7 @@ def jenkinsUrl():
 
 def verdaccioUrl():
     return "http://" + getDockerHostAddr() + ":" + getContainerPort("verdaccio", 4873)
+
+
+def s3EndpointUrl():
+    return "http://" + getDockerHostAddr() + ":" + getContainerPort("s3", 80)

@@ -38,6 +38,14 @@ services:
     ports:
       - '8081:8081'
 
+  s3:
+    image: andrewgaul/s3proxy
+    environment:
+      S3PROXY_AUTHORIZATION: none
+    ports:
+      - '8082:80'
+
+
 
 volumes:
   jenkins-workspace-volume:
