@@ -3,7 +3,6 @@ USER root
 
 RUN apt-get update && \
     apt-get -y install sudo jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
-    pip install --upgrade pip && \
     pip install --upgrade awscli
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
