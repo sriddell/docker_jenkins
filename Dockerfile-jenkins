@@ -18,7 +18,7 @@ RUN touch /var/run/docker.sock
 RUN chown root:docker /var/run/docker.sock
 
 #The install-plugins.sh in the base image appears to have bugs, replacing it with a working one
-COPY ./templates/install-plugins.sh /usr/local/bin/install-plugins.sh
+COPY ./install-plugins.sh /usr/local/bin/install-plugins.sh
 RUN chmod +x /usr/local/bin/install-plugins.sh
 
 #We can't install plugins or anything in jenkins home as part of the docker build, because it affects the jenkins home,
@@ -26,7 +26,7 @@ RUN chmod +x /usr/local/bin/install-plugins.sh
 # So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
 #installs the plugins at startup, then invokes the original startup script.
 RUN mv /usr/local/bin/jenkins.sh /usr/local/bin/jenkins_orig.sh
-COPY ./templates/startup.sh /usr/local/bin/jenkins.sh
+COPY ./startup.sh /usr/local/bin/jenkins.sh
 RUN chmod +x /usr/local/bin/jenkins.sh
 
 #Put jenkins in needed groups to access docker

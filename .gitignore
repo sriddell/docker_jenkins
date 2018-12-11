@@ -1,4 +1,5 @@
 build
+*.egg-info
 tmp
 venv
 __pycache__
