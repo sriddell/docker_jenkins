@@ -1,0 +1,5 @@
+setup.py
+jenkins_utils.egg-info/PKG-INFO
+jenkins_utils.egg-info/SOURCES.txt
+jenkins_utils.egg-info/dependency_links.txt
+jenkins_utils.egg-info/top_level.txt

@@ -1,7 +1,7 @@
-import docker_jenkins.gitlab_common as git
+import gitlab_common as git
 import os
 import shutil
-from docker_jenkins.common import getGitInfo
+from common import getGitInfo
 import subprocess
 
 def createAndLoadRepo(repoName, src, branch="master", tag=None):

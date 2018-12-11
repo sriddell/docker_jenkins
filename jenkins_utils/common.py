@@ -4,6 +4,7 @@ import requests
 import json
 import os
 
+
 def check_output(*args, **kwargs):
     path = os.path.dirname(__file__)
     result = subprocess.check_output(*args, cwd=path, **kwargs)
@@ -13,6 +14,7 @@ def check_output(*args, **kwargs):
         return result.decode('utf-8')
     else:
         return result
+
 
 def getDockerHostAddr():
     try:
@@ -28,9 +30,11 @@ def getDockerHostAddr():
         s.close()
         return addr
 
+
 def getContainerPort(service, port="3000"):
-    output = check_output(["docker-compose", "port", service, str(port)])
-    return output.split(":")[1].strip()
+    output = check_output(['docker-compose', 'port', service, str(port)])
+    return output.split(':')[1].strip()
+
 
 def getGitlabToken():
     port = getContainerPort("gitlab", "80")
@@ -39,9 +43,11 @@ def getGitlabToken():
     j = json.loads(resp.text)
     return j['private_token']
 
+
 def gitLabUrl():
     url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/api/v3/"
     return url
+
 
 def getGitInfo():
     info = {}

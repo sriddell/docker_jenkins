@@ -1,0 +1,13 @@
+Metadata-Version: 1.1
+Name: jenkins-utils
+Version: 0.0.1
+Summary: Package of utilities for dockerized jenkins
+Home-page: UNKNOWN
+Author: Shane Riddell
+Author-email: shaneridell@icloud.com
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
