@@ -6,7 +6,7 @@ setuptools.setup(
         'click>=6.7',
         'jinja2'
     ],
-    name="jenkins_utils",
+    name="docker_jenkins_utils",
     version="0.0.1",
     author="Shane Riddell",
     author_email="shaneridell@icloud.com",

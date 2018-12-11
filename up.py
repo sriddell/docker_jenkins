@@ -6,7 +6,7 @@ import time
 import calendar
 import sys
 import shutil
-from jenkins_utils.common import getDockerHostAddr, getContainerPort
+from docker_jenkins_utils.common import getDockerHostAddr, getContainerPort
 
 
 DOCKER_HOST_ADDR = os.environ.get('DOCKER_HOST_ADDR')
