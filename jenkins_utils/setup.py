@@ -1,6 +1,11 @@
 import setuptools
 
 setuptools.setup(
+    install_requires=[
+        'requests>=2.18.2',
+        'click>=6.7',
+        'jinja2'
+    ],
     name="jenkins_utils",
     version="0.0.1",
     author="Shane Riddell",
