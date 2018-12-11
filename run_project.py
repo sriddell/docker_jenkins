@@ -6,9 +6,9 @@
 # 3. Copy the plugins.txt file defining the plugins that should be loaded into jenkins to your project root.
 # For DSL Jenkinsfile development, the follow list is recommended as a starting point:
 #
-import jenkins_utils.jenkins_common as jenkins
-import jenkins_utils.test_utils as test_utils
-import jenkins_utils.gitlab_common as git
+import docker_jenkins_utils.jenkins_common as jenkins
+import docker_jenkins_utils.test_utils as test_utils
+import docker_jenkins_utils.gitlab_common as git
 import shutil
 import os
 import sys
