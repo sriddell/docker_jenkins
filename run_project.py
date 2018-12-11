@@ -12,6 +12,8 @@ import docker_jenkins_utils.gitlab_common as git
 import shutil
 import os
 import sys
+from dotenv import dotenv_values
+env = dotenv_values()
 
 source = sys.argv[1]
 
@@ -21,6 +23,9 @@ if os.path.exists(tmpdir):
     os.mkdir(tmpdir)
 git.deleteRepos()
 jenkins.clearAll()
+
+for key in env:
+    jenkins.addEnvVar(key, env[key])
 
 target = tmpdir + '/project'
 shutil.copytree(source, target)

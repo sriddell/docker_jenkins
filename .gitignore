@@ -1,4 +1,5 @@
 build
+.env
 *.egg-info
 tmp
 venv
