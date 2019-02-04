@@ -1,6 +1,6 @@
 from __future__ import print_function
 import requests
-from common import gitLabUrl, getGitlabToken
+from docker_jenkins_utils.common import gitLabUrl, getGitlabToken
 
 
 def createRepo(name):

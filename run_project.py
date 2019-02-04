@@ -7,7 +7,7 @@
 # For DSL Jenkinsfile development, the follow list is recommended as a starting point:
 #
 import docker_jenkins_utils.jenkins_common as jenkins
-import docker_jenkins_utils.test_utils as test_utils
+import docker_jenkins_utils.utils as test_utils
 import docker_jenkins_utils.gitlab_common as git
 import shutil
 import os

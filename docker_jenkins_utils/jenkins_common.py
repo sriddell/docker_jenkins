@@ -1,6 +1,6 @@
 from __future__ import print_function
 import requests
-import common
+from docker_jenkins_utils import common
 from jinja2 import Environment, FileSystemLoader
 import os
 import json
