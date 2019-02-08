@@ -62,4 +62,4 @@ def verdaccioUrl():
 
 
 def s3EndpointUrl():
-    return "http://" + getDockerHostAddr() + ":" + getContainerPort("s3", 80)
+    return "http://" + getDockerHostAddr() + ":" + getContainerPort("s3", 9090)

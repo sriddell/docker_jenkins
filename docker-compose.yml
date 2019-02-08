@@ -39,11 +39,11 @@ services:
       - '8081:8081'
 
   s3:
-    image: andrewgaul/s3proxy
+    image: localstack/localstack
     environment:
-      S3PROXY_AUTHORIZATION: none
+      - SERVICES=s3:9090
     ports:
-      - '8082:80'
+      - '8082:9090'
 
 
 
