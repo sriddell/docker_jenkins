@@ -6,6 +6,7 @@ import os
 import json
 import time
 
+
 def addJob(name, repoUrl):
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
@@ -15,12 +16,14 @@ def addJob(name, repoUrl):
     if r.status_code != 200:
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
+
 def runJob(job, branch):
     requests.post(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/build?delay=0sec")
 
+
 def waitForBuild(job, branch):
     buildId = waitForBuildToExist(job, branch)
-    if buildId == None:
+    if buildId is None:
         return None
     status = -1
     count = 900
@@ -30,12 +33,13 @@ def waitForBuild(job, branch):
         status = resp.status_code
         if status == 200:
             j = json.loads(resp.text)
-            if j['building'] == False:
+            if j['building'] is False:
                 return j
             else:
                 status = -1
                 time.sleep(1)
     return None
+
 
 def getConsole(job, branch, buildId):
     resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console")
@@ -44,11 +48,30 @@ def getConsole(job, branch, buildId):
     else:
         raise Exception("Failed to retrieve console " + str(resp.status_code))
 
+
 def getArtifact(job, branch, buildId, relativePath):
     print(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)
     resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)
     if resp.status_code != 200:
         raise Exception("Failed to retrieve artifact " + str(resp.status_code))
+    return resp.text
+
+
+def proceed(job, branch, buildId, inputId):
+    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/proceedEmpty"
+    print(url)
+    resp = requests.post(url)
+    if resp.status_code != 200:
+        raise Exception("Failed to proceed" + str(resp.status_code))
+    return resp.text
+
+
+def abort(job, branch, buildId, inputId):
+    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/abort"
+    print(url)
+    resp = requests.post(url)
+    if resp.status_code != 200:
+        raise Exception("Failed to abort" + str(resp.status_code))
     return resp.text
 
 
@@ -68,10 +91,12 @@ def waitForBuildToExist(job, branch):
                 return j['builds'][0]['number']
     return None
 
+
 def scanMultibranchPipeline(job):
     r = requests.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0")
     if r.status_code != 200:
         raise Exception("Failed scan multibranch pipeline " + str(r.status_code))
+
 
 def addUsernamePasswordCredential(id, username, password):
     template = """
@@ -87,6 +112,7 @@ SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(
     if r.status_code != 200:
         raise Exception("Failed to set credential; status was " + str(r.status_code))
 
+
 def clearAllJobs():
     template = """
 import hudson.matrix.*
@@ -100,6 +126,7 @@ while (Jenkins.getInstance().getAllItems().size() > 0) {
     r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template}, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to clear all jobs; status was " + str(r.status_code))
+
 
 def addEnvVar(name, value):
     template = """
@@ -130,6 +157,7 @@ instance.save()
     if r.status_code != 200:
         raise Exception("Failed to set env var; status was " + str(r.status_code))
 
+
 def clearEnvVars():
     template = """
 import hudson.slaves.EnvironmentVariablesNodeProperty
@@ -159,6 +187,7 @@ instance.save()
     if r.status_code != 200:
         raise Exception("Failed to clear all env vars; status was " + str(r.status_code))
 
+
 def addSecuritySignature(sig):
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
@@ -167,6 +196,7 @@ def addSecuritySignature(sig):
     r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to add security signatures; status was " + str(r.status_code))
+
 
 def clearAll():
     clearEnvVars()
