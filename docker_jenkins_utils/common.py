@@ -3,6 +3,38 @@ import sys
 import requests
 import json
 import os
+import time
+
+DOCKER_HOST_ADDR = None
+
+
+def checkHealth(service, port="3000", path="/health"):
+    port = getContainerPort(service, port)
+    url = "http://" + getDockerHostAddr() + ":" + port + path
+    healthy = False
+    count = 0
+    print("Checking for health of " + service + " at " + url)
+    sys.stdout.flush()
+    maxRetries = 40
+    while not healthy and count < maxRetries:
+        time.sleep(min(5, count))
+        count = count + 1
+        try:
+            r = requests.get(url)
+            if r.status_code == 200 or r.status_code == 204 or r.status_code == 403:
+                healthy = True
+        except requests.ConnectionError:
+            pass
+        if not healthy and count < maxRetries:
+            print("...not healthy, waiting " + str(min(5, count)) + " seconds to try again; " + str(maxRetries - count) + " tries left")
+            sys.stdout.flush()
+    if not healthy:
+        print("Service " + service + " failed to become healthy")
+        sys.stdout.flush()
+        sys.exit(1)
+    else:
+        print(service + " is healthy")
+        sys.stdout.flush()
 
 
 def check_output(*args, **kwargs):
@@ -17,23 +49,66 @@ def check_output(*args, **kwargs):
 
 
 def getDockerHostAddr():
-    try:
-        output = check_output(["docker-machine", "active"]).strip()
-        return check_output(["docker-machine", "ip", output]).strip()
-    except (OSError, subprocess.CalledProcessError):
-        # We will reach this branch if the "docker-machine" command does not
-        # exist or if "docker-machine active" exits with an error status
-        import socket
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8",53))
-        addr = s.getsockname()[0]
-        s.close()
-        return addr
+    global DOCKER_HOST_ADDR
+    if DOCKER_HOST_ADDR is None:
+        DOCKER_HOST_ADDR = os.environ.get('DOCKER_HOST_ADDR')
+        if DOCKER_HOST_ADDR is None:
+            try:
+                output = check_output(["docker-machine", "active"]).strip()
+                DOCKER_HOST_ADDR = check_output(["docker-machine", "ip", output]).strip()
+            except (OSError, subprocess.CalledProcessError):
+                # We will reach this branch if the "docker-machine" command does not
+                # exist or if "docker-machine active" exits with an error status
+                import socket
+                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                s.connect(("8.8.8.8", 53))
+                addr = s.getsockname()[0]
+                s.close()
+                DOCKER_HOST_ADDR = addr
+    return DOCKER_HOST_ADDR
 
 
 def getContainerPort(service, port="3000"):
     output = check_output(['docker-compose', 'port', service, str(port)])
     return output.split(':')[1].strip()
+
+
+def execute(command=[]):
+    print(command)
+    path = os.path.abspath(__file__)
+    dir_path = os.path.dirname(path)
+    dir_path = os.path.abspath(dir_path + '/..')
+    process = subprocess.Popen(command, cwd=dir_path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    # Poll process for new output until finished
+    while True:
+        nextline = process.stdout.readline()
+        if nextline.decode('utf-8') == '' and process.poll() is not None:
+            break
+        print(nextline.decode("utf-8"))
+        sys.stdout.flush()
+
+    output = process.communicate()[0]
+    exitCode = process.returncode
+
+    if (exitCode == 0):
+        return output
+    else:
+        raise subprocess.ProcessException(command, exitCode, output)
+
+
+def reset_verdaccio():
+    execute("docker-compose kill verdaccio")
+    execute("docker-compose rm -f verdaccio")
+    execute("docker-compose up -d verdaccio")
+    checkHealth("verdaccio", "4873", "")
+
+
+def reset_s3():
+    execute("docker-compose kill s3")
+    execute("docker-compose rm -f s3")
+    execute("docker-compose up -d s3")
+    checkHealth("s3", "9090", "")
 
 
 def getGitlabToken():
@@ -54,8 +129,10 @@ def getGitInfo():
     info['baseUrl'] = "http://root:password@" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
     return info
 
+
 def jenkinsUrl():
     return "http://admin:admin@" + getDockerHostAddr() + ":" + getContainerPort("jenkins", 8080) + "/"
+
 
 def verdaccioUrl():
     return "http://" + getDockerHostAddr() + ":" + getContainerPort("verdaccio", 4873)
