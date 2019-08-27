@@ -11,6 +11,8 @@ if not os.path.exists('build'):
     os.makedirs('build')
 if os.path.exists("../plugins.txt"):
     shutil.copyfile('../plugins.txt', 'build/plugins.txt')
+if os.path.exists("../testing/plugins.txt"):
+    shutil.copyfile('../testing/plugins.txt', 'build/plugins.txt')
 else:
     with open("build/plugins.txt", 'a'):
         os.utime("build/plugins.txt", None)
