@@ -21,12 +21,13 @@ def createAndLoadRepo(repoName, src, branch="master", tag=None):
 
 
 def loadPipeline(dir):
-    #os.mkdir(dir.dirname + "/pipeline")
-    print(dir.dirname)
     if os.path.exists("./src"):
         shutil.copytree("./src", dir.dirname + '/pipeline/src')
     if os.path.exists("./vars"):
         shutil.copytree("./vars", dir.dirname + '/pipeline/vars')
+    if os.path.exists("./pipeline.groovy"):
+        os.mkdir(dir.dirname + "/pipeline")
+        shutil.copy("./pipeline.groovy", dir.dirname + "/pipeline/pipeline.groovy")
     createAndLoadRepo("pipeline", dir.dirname + "/pipeline", tag="DEVELOP")
 
 
