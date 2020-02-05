@@ -19,7 +19,7 @@ services:
       - '50000:50000'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins-workspace-volume:/var/jenkins_home/workspace
+      - jenkins-workspace-volume:/var/jenkins_home/
     environment:
         AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
