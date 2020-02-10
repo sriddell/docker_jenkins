@@ -17,19 +17,34 @@ def addJob(name, repoUrl):
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
 
+def addPipelineJob(name, repoUrl, properties_content):
+    thisDir = os.path.dirname(os.path.abspath(__file__))
+    j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
+    content = j2.get_template('templates/pipeline.xml').render(name=name, repo_url=repoUrl, properties_content=properties_content)
+    headers = {"Content-Type": "text/xml; charset=UTF-8"}
+    r = requests.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
+    if r.status_code != 200:
+        raise Exception("Failed to add job; status was " + str(r.status_code))
+
+
 def runJob(job, branch):
     requests.post(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/build?delay=0sec")
 
 
-def waitForBuild(job, branch):
+def waitForBuild(job, branch=None):
     buildId = waitForBuildToExist(job, branch)
     if buildId is None:
         return None
     status = -1
     count = 900
+    url = None
+    if branch is not None:
+        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/api/json"
+    else:
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/api/json"
     while status != 200 and count >= 0:
         count = count - 1
-        resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/api/json")
+        resp = requests.get(url)
         status = resp.status_code
         if status == 200:
             j = json.loads(resp.text)
@@ -42,7 +57,12 @@ def waitForBuild(job, branch):
 
 
 def getConsole(job, branch, buildId):
-    resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console")
+    url = None
+    if branch is not None:
+        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console"
+    else:
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/console"
+    resp = requests.get(url)
     if resp.status_code == 200:
         return resp.text
     else:
@@ -75,12 +95,17 @@ def abort(job, branch, buildId, inputId):
     return resp.text
 
 
-def waitForBuildToExist(job, branch):
+def waitForBuildToExist(job, branch=None):
     status = -1
     count = 60
+    url = None
+    if branch is not None:
+        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/api/json"
+    else:
+        url = common.jenkinsUrl() + "job/" + job + "/api/json"
     while status != 200 and count >= 0:
         count = count - 1
-        resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/api/json")
+        resp = requests.get(url)
         status = resp.status_code
         if status == 200:
             j = json.loads(resp.text)
@@ -96,6 +121,12 @@ def scanMultibranchPipeline(job):
     r = requests.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0")
     if r.status_code != 200:
         raise Exception("Failed scan multibranch pipeline " + str(r.status_code))
+
+
+def runPipeline(job):
+    r = requests.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0")
+    if r.status_code != 201:
+        raise Exception("Failed to run pipeline " + str(r.status_code))
 
 
 def addUsernamePasswordCredential(id, username, password):
