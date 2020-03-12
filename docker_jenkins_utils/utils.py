@@ -20,6 +20,10 @@ def createAndLoadRepo(repoName, src, branch="master", tag=None):
     return url
 
 
+def cloneRepo(url, targetDir):
+    execute(["git", "clone", url], targetDir)
+
+
 def loadPipeline(dir):
     if os.path.exists("./src"):
         shutil.copytree("./src", dir.dirname + '/pipeline/src')

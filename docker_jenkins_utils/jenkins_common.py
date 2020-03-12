@@ -103,12 +103,31 @@ def addUsernamePasswordCredential(id, username, password):
 import com.cloudbees.plugins.credentials.impl.*;
 import com.cloudbees.plugins.credentials.*;
 import com.cloudbees.plugins.credentials.domains.*;
-Credentials c = (Credentials) new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL,"{0}", "description", "{1}", "{2}")
+Credentials c = (Credentials) new 'UsernamePasswordCredentialsImpl'(CredentialsScope.GLOBAL,"{0}", "description", "{1}", "{2}")
 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
 """
 
     headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
     r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template.format(id, username, password)}, headers=headers)
+    if r.status_code != 200:
+        raise Exception("Failed to set credential; status was " + str(r.status_code))
+
+
+def addSshUser(id, username, privateKeyString):
+    template = '''
+import com.cloudbees.plugins.credentials.impl.*;
+import com.cloudbees.plugins.credentials.*;
+import com.cloudbees.plugins.credentials.domains.*;
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.*;
+key = """''' + privateKeyString + '''"""
+BasicSSHUserPrivateKey.DirectEntryPrivateKeySource source = new BasicSSHUserPrivateKey.DirectEntryPrivateKeySource(key)
+Credentials c = (Credentials) new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL,"{0}", "{1}", source, "", "description")
+SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
+'''
+
+    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
+    d = {'script': template.format(id, username)}
+    r = requests.post(common.jenkinsUrl() + "scriptText", data=d, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to set credential; status was " + str(r.status_code))
 

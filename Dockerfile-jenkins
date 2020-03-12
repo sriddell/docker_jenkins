@@ -10,6 +10,7 @@ RUN groupadd docker
 
 ARG CACHEBUST=1
 
+RUN rm -f /home/jenkins/.ssh/known_hosts
 ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
