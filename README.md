@@ -6,6 +6,14 @@ Builds jenkins into a container along with the workflow-aggregator plugin (for p
 
 Also sets the docker group ID to match that in a docker-machine VM, and installs docker client in the container (at runtime), so it can match the external.
 
+##Caveats
+
+This is not meant to run in production - it is meant to run on developer hardware, or restricted/private hardware only for testing pipelines.
+
+As such, the Jenkin's admin login is hardcoded as admin/admin.
+
+If you want to use it outside of a secure testing environment, you should remove the hardcoded password setting in artifactory_plugin.xml and provide a properly encoded value at runtime.
+
 ##Running
 In the directory above docker_jenkins, define a plugins.txt file that lists the plugins you want to be automatically installed in jenkins, e.g.
 
