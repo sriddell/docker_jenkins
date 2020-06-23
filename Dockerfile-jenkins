@@ -18,8 +18,7 @@ RUN touch /var/run/docker.sock
 RUN chown root:docker /var/run/docker.sock
 
 #The install-plugins.sh in the base image appears to have bugs, replacing it with a working one
-COPY ./install-plugins.sh /usr/local/bin/install-plugins.sh
-RUN chmod +x /usr/local/bin/install-plugins.sh
+
 
 #We can't install plugins or anything in jenkins home as part of the docker build, because it affects the jenkins home,
 # which is a VOLUME in the parent image so downstream builds can't modify it.

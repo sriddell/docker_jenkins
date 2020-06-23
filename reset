@@ -1,2 +1,2 @@
-docker-compose kill jenkins && docker-compose rm -f jenkins
+docker-compose down jenkins --volumes && docker-compose rm -f jenkins
 ./up
