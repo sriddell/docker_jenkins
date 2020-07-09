@@ -5,14 +5,18 @@ from jinja2 import Environment, FileSystemLoader
 import os
 import json
 import time
+import urllib
 
 
 def addJob(name, repoUrl):
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
     content = j2.get_template('templates/config.xml').render(name=name, repo_url=repoUrl)
-    headers = {"Content-Type": "text/xml; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
+    headers.update({"Content-Type": "text/xml; charset=UTF-8"})
+    r = session.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
@@ -118,13 +122,19 @@ def waitForBuildToExist(job, branch=None):
 
 
 def scanMultibranchPipeline(job):
-    r = requests.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0")
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
+    r = session.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0", headers=headers)
     if r.status_code != 200:
         raise Exception("Failed scan multibranch pipeline " + str(r.status_code))
 
 
 def runPipeline(job):
-    r = requests.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0")
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
+    r = session.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0", headers=headers)
     if r.status_code != 201:
         raise Exception("Failed to run pipeline " + str(r.status_code))
 
@@ -137,11 +147,7 @@ import com.cloudbees.plugins.credentials.domains.*;
 Credentials c = (Credentials) new 'UsernamePasswordCredentialsImpl'(CredentialsScope.GLOBAL,"{0}", "description", "{1}", "{2}")
 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
 """
-
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template.format(id, username, password)}, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to set credential; status was " + str(r.status_code))
+    executeScript(template.format(id, username, password))
 
 
 def addSshUser(id, username, privateKeyString):
@@ -156,11 +162,7 @@ Credentials c = (Credentials) new BasicSSHUserPrivateKey(CredentialsScope.GLOBAL
 SystemCredentialsProvider.getInstance().getStore().addCredentials(Domain.global(), c)
 '''
 
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    d = {'script': template.format(id, username)}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data=d, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to set credential; status was " + str(r.status_code))
+    executeScript(template.format(id, username))
 
 
 def clearAllJobs():
@@ -172,10 +174,7 @@ while (Jenkins.getInstance().getAllItems().size() > 0) {
     Jenkins.getInstance().getAllItems()[0].delete()
 }
 """
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template}, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to clear all jobs; status was " + str(r.status_code))
+    executeScript(template)
 
 
 def addEnvVar(name, value):
@@ -202,10 +201,7 @@ envVars.put("{0}", "{1}")
 
 instance.save()
 """
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template.format(name, value)}, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to set env var; status was " + str(r.status_code))
+    executeScript(template.format(name, value))
 
 
 def clearEnvVars():
@@ -232,21 +228,46 @@ envVars.clear()
 
 instance.save()
 """
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': template}, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to clear all env vars; status was " + str(r.status_code))
+    executeScript(template)
 
 
 def addSecuritySignature(sig):
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
     script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
-    headers = {"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
-    if r.status_code != 200:
-        raise Exception("Failed to add security signatures; status was " + str(r.status_code))
+    executeScript(script)
 
+
+def executeScript(script):
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
+    headers.update({"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"})
+    r = session.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
+    if r.status_code != 200:
+        raise Exception("Failed to run script " + script)
+
+
+def prepareSession():
+    # Build the Jenkins crumb issuer URL
+    session = requests.session()
+    parsed_url = urllib.parse.urlparse(common.jenkinsUrl())
+    crumb_issuer_url = urllib.parse.urlunparse((parsed_url.scheme,
+                                                parsed_url.netloc,
+                                                'crumbIssuer/api/json',
+                                                '', '', ''))
+
+    # Get the Jenkins crumb
+    auth = requests.auth.HTTPBasicAuth('admin', 'admin')
+    r = session.get(crumb_issuer_url, auth=auth)
+    json = r.json()
+    crumb = {json['crumbRequestField']: json['crumb']}
+    headers = {}
+    headers.update(crumb)
+    return {
+        'session': session,
+        'headers': headers
+    }
 
 def clearAll():
     clearEnvVars()
