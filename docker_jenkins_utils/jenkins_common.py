@@ -22,11 +22,14 @@ def addJob(name, repoUrl):
 
 
 def addPipelineJob(name, repoUrl, directory):
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
     content = j2.get_template('templates/pipeline.xml').render(name=name, repo_url=repoUrl, directory=directory)
-    headers = {"Content-Type": "text/xml; charset=UTF-8"}
-    r = requests.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
+    headers.update({"Content-Type": "text/xml; charset=UTF-8"})
+    r = session.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
