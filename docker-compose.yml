@@ -14,6 +14,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-jenkins
+    depends_on:
+      - gitlab
     ports:
       - '8080:8080'
       - '50000:50000'
@@ -38,12 +40,12 @@ services:
     ports:
       - '8081:8081'
 
-  s3:
+  aws:
     image: localstack/localstack
     environment:
-      - SERVICES=s3:9090
+      - SERVICES=s3,ssm
     ports:
-      - '8082:9090'
+      - '4566:4566'
 
 
 

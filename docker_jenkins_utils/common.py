@@ -4,6 +4,7 @@ import requests
 import json
 import os
 import time
+import boto3
 
 DOCKER_HOST_ADDR = None
 
@@ -97,6 +98,16 @@ def execute(command=[]):
         raise subprocess.ProcessException(command, exitCode, output)
 
 
+def aws_put_secure_string(name, value):
+    client = boto3.client('ssm', endpoint_url=awsEndpointUrl())
+    client.put_parameter(
+        Name=name,
+        Value=value,
+        Type='SecureString',
+        Overwrite=True
+    )
+
+
 def reset_verdaccio():
     execute("docker-compose kill verdaccio")
     execute("docker-compose rm -f verdaccio")
@@ -104,11 +115,11 @@ def reset_verdaccio():
     checkHealth("verdaccio", "4873", "")
 
 
-def reset_s3():
-    execute("docker-compose kill s3")
-    execute("docker-compose rm -f s3")
-    execute("docker-compose up -d s3")
-    checkHealth("s3", "9090", "")
+def reset_aws():
+    execute("docker-compose kill aws")
+    execute("docker-compose rm -f aws")
+    execute("docker-compose up -d aws")
+    checkHealth("aws", "4566")
 
 
 def getGitlabToken():
@@ -138,5 +149,5 @@ def verdaccioUrl():
     return "http://" + getDockerHostAddr() + ":" + getContainerPort("verdaccio", 4873)
 
 
-def s3EndpointUrl():
-    return "http://" + getDockerHostAddr() + ":" + getContainerPort("s3", 9090)
+def awsEndpointUrl():
+    return "http://" + getDockerHostAddr() + ":" + getContainerPort("aws", 4566)
