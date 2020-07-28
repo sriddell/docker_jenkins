@@ -10,7 +10,7 @@ echo "copying artifactory plugin configuration"
 cp /tmp/artifactory_plugin.xml /var/jenkins_home/org.jfrog.hudson.ArtifactoryBuilder.xml
 chown jenkins:jenkins /var/jenkins_home/org.jfrog.hudson.ArtifactoryBuilder.xml
 
-mkdir /var/jenkins_home/.ssh
+mkdir -p /var/jenkins_home/.ssh
 ssh-keyscan -H gitlab >> /var/jenkins_home/.ssh/known_hosts
 sudo chown jenkins:jenkins /var/jenkins_home/.ssh
 
