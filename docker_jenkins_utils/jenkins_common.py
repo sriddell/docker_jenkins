@@ -68,7 +68,7 @@ def getConsole(job, branch, buildId):
     if branch is not None:
         url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/console"
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleFull"
     resp = requests.get(url)
     if resp.status_code == 200:
         return resp.text
