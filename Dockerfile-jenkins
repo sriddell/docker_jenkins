@@ -14,8 +14,8 @@ ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
     ./install_docker.sh
-RUN touch /var/run/docker.sock
-RUN chown root:docker /var/run/docker.sock
+#RUN touch /var/run/docker.sock
+#RUN chown root:docker /var/run/docker.sock
 
 #The install-plugins.sh in the base image appears to have bugs, replacing it with a working one
 

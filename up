@@ -1,6 +1,2 @@
 #!/bin/bash
-if command -v python3 > /dev/null 2>&1; then
-    python3 up.py all
-else
-    python up.py all
-fi
+python up.py all

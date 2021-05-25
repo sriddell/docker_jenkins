@@ -13,6 +13,7 @@ chown jenkins:jenkins /var/jenkins_home/org.jfrog.hudson.ArtifactoryBuilder.xml
 mkdir -p /var/jenkins_home/.ssh
 ssh-keyscan -H gitlab >> /var/jenkins_home/.ssh/known_hosts
 sudo chown jenkins:jenkins /var/jenkins_home/.ssh
+sudo chown jenkins:jenkins /var/run/docker.sock
 
 /usr/local/bin/jenkins_orig.sh
 
