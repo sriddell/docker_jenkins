@@ -64,12 +64,16 @@ def waitForBuild(job, branch=None):
 
 
 def getConsole(job, branch, buildId):
+
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
     url = None
     if branch is not None:
         url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleFull"
-    resp = requests.get(url)
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/console"
+    resp = session.get(url, headers=headers)
     if resp.status_code == 200:
         return resp.text
     else:
@@ -271,6 +275,7 @@ def prepareSession():
         'session': session,
         'headers': headers
     }
+
 
 def clearAll():
     clearEnvVars()
