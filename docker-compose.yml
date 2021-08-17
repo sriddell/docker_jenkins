@@ -47,6 +47,12 @@ services:
     ports:
       - '4566:4566'
 
+  kubeconfig-server:
+    build:
+      context: .
+      dockerfile: Dockerfile-kubeconfig
+    ports:
+      - "8082:80"
 
 
 volumes:

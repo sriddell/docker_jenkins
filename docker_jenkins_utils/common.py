@@ -99,7 +99,7 @@ def execute(command=[]):
 
 
 def aws_put_secure_string(name, value):
-    client = boto3.client('ssm', endpoint_url=awsEndpointUrl())
+    client = boto3.client('ssm', endpoint_url=awsEndpointUrl(), region_name='us-east-1')
     client.put_parameter(
         Name=name,
         Value=value,

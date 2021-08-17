@@ -70,9 +70,9 @@ def getConsole(job, branch, buildId):
     headers = result['headers']
     url = None
     if branch is not None:
-        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/console"
+        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/consoleFull"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/console"
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleFull"
     resp = session.get(url, headers=headers)
     if resp.status_code == 200:
         return resp.text
