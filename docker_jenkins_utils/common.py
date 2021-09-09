@@ -123,21 +123,19 @@ def reset_aws():
 
 
 def getGitlabToken():
-    port = getContainerPort("gitlab", "80")
-    url = "http://" + getDockerHostAddr() + ":" + port + "/api/v3/session?login=root&password=password"
-    resp = requests.post(url)
-    j = json.loads(resp.text)
-    return j['private_token']
+    # This is now created during gitlab startup via the gitlab_init.rb file
+    return 'skfj2348yrhauewsdfisa'
 
 
 def gitLabUrl():
-    url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/api/v3/"
+    url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/api/v4/"
     return url
 
 
 def getGitInfo():
     info = {}
-    info['baseUrl'] = "http://root:password@" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
+    info['baseUrlWithCreds'] = "http://root:password@" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
+    info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
     return info
 
 

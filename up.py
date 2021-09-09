@@ -32,3 +32,5 @@ checkHealth("verdaccio", "4873", "")
 checkHealth("artifactory", "8081", "")
 checkHealth("gitlab", "80", "")
 checkHealth("aws", "4566")
+
+execute("docker-compose exec gitlab gitlab-rails runner /gitlab_init.rb")

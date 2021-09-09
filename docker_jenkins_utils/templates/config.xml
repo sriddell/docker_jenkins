@@ -27,7 +27,7 @@
         <source class="jenkins.plugins.git.GitSCMSource" plugin="git">
           <id>95f9a190-8753-4ad1-9235-6d9a0a50a037</id>
           <remote>{{ repo_url }}</remote>
-          <credentialsId></credentialsId>
+          <credentialsId>cicd</credentialsId>
           <traits>
             <jenkins.plugins.git.traits.BranchDiscoveryTrait/>
           </traits>

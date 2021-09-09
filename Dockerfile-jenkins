@@ -14,6 +14,7 @@ ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
     ./install_docker.sh
+
 #RUN touch /var/run/docker.sock
 #RUN chown root:docker /var/run/docker.sock
 
@@ -37,16 +38,24 @@ ARG DOCKER_HOST_ADDR
 RUN echo $DOCKER_HOST_ADDR
 RUN sed -i "s/DOCKER_HOST_ADDR/$DOCKER_HOST_ADDR/g" /tmp/artifactory_plugin.xml
 RUN chown jenkins:jenkins /tmp/artifactory_plugin.xml
-
+RUN mkdir /casc_configs
+RUN chown jenkins:jenkins /casc_configs
+ENV CASC_JENKINS_CONFIG=/casc_configs
 #Switch back to jenkins user and store the plugins
 USER jenkins
 RUN mkdir /var/jenkins_home/workspace
+
 COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
+COPY ./jenkins/casc/credentials.yaml /casc_configs
 #Set username, password, and updates URL
 ENV JENKINS_USER admin
 ENV JENKINS_PASS admin
 ENV JENKINS_UC https://updates.jenkins.io
+
+
+RUN chown jenkins:jenkins /casc_configs
+
 
 # Skip initial setup
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false

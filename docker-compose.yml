@@ -5,10 +5,17 @@ services:
       context: .
       dockerfile: Dockerfile-gitlab
     environment:
-      GITLAB_ROOT_PASSWORD: password
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 2224
+        gitlab_rails['initial_root_password'] = "password"
+        gitlab_rails['store_initial_root_password'] = true
     ports:
       - '8000:80'
       - '2224:22'
+    volumes:
+      - gitlab-config:/etc/gitlab
+      - gitlab-log:/var/log/gitlab
+      - gitlab-data:/var/opt/gitlab
 
   jenkins:
     build:
@@ -57,3 +64,6 @@ services:
 
 volumes:
   jenkins-workspace-volume:
+  gitlab-config:
+  gitlab-log:
+  gitlab-data:

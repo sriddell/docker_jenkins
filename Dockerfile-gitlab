@@ -1,4 +1,4 @@
-FROM gitlab/gitlab-ce:9.4.5-ce.0
-
+FROM gitlab/gitlab-ce:14.1.5-ce.0
+ADD gitlab_init.rb /gitlab_init.rb
 #RUN echo "gitlab_rails['initial_root_password'] = \"password\"" >> /opt/gitlab/etc/gitlab.rb.template
 #RUN echo "external_url 'http://foo.bar.com:8000'" >> /opt/gitlab/etc/gitlab.rb.template

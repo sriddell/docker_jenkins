@@ -11,13 +11,13 @@ def createAndLoadRepo(repoName, src, branch="master", tag=None):
     execute(["git", "checkout", "-b", branch], src)
     execute(["git", "add", "."], src)
     execute(["git", "commit", "-am", "'init'"], src)
-    url = getGitInfo()['baseUrl'] + "/" + repoName + ".git"
+    url = getGitInfo()['baseUrlWithCreds'] + "/" + repoName + ".git"
     execute(["git", "remote", "add", "origin", url], src)
     execute(["git", "push", "origin", branch], src)
     if tag is not None:
         execute(["git", "tag", tag], src)
         execute(["git", "push", "origin", tag], src)
-    return url
+    return getGitInfo()['baseUrl'] + "/" + repoName + ".git"
 
 
 def cloneRepo(url, targetDir):
