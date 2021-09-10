@@ -7,7 +7,7 @@ def createRepo(name):
     token = getGitlabToken()
     url = gitLabUrl() + "projects"
     headers = {'PRIVATE-TOKEN': token}
-    params = {'name': name, 'public': 'true'}
+    params = {'name': name, 'visibility': 'internal'}
     requests.post(url, headers=headers, params=params)
 
 
@@ -25,7 +25,9 @@ def getRepos():
     url = gitLabUrl()
     headers = {'PRIVATE-TOKEN': token}
     url = url + "projects"
+    print(url)
     resp = requests.get(url, headers=headers)
+    print(resp)
     return resp.json()
 
 
@@ -35,5 +37,7 @@ def deleteRepos():
         token = getGitlabToken()
         url = gitLabUrl()
         headers = {'PRIVATE-TOKEN': token}
+        print(">>>>")
+        print(repo)
         url = url + "projects/" + str(repo['id'])
         requests.delete(url, headers=headers)

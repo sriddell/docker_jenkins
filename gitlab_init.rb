@@ -8,7 +8,7 @@ tokens.each do |t|
     end
 end
 if !found
-    token = u.personal_access_tokens.create(scopes: [:api], name: 'jenkins');
+    token = u.personal_access_tokens.create(scopes: [:api, :read_user, :read_api, :read_repository, :write_repository], name: 'jenkins');
     token.set_token("skfj2348yrhauewsdfisa");
     token.save!
 end
