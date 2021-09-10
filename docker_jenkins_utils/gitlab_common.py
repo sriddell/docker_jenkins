@@ -37,7 +37,5 @@ def deleteRepos():
         token = getGitlabToken()
         url = gitLabUrl()
         headers = {'PRIVATE-TOKEN': token}
-        print(">>>>")
-        print(repo)
         url = url + "projects/" + str(repo['id'])
         requests.delete(url, headers=headers)
