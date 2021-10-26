@@ -48,7 +48,7 @@ services:
       - '8081:8081'
 
   aws:
-    image: localstack/localstack
+    image: localstack/localstack:0.12.17 
     environment:
       - SERVICES=s3,ssm
     ports:
