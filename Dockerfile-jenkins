@@ -2,7 +2,7 @@ FROM jenkins/jenkins:2.249.1
 USER root
 
 RUN apt-get update
-RUN apt-get upgrade ca-certificates -y
+RUN apt-get upgrade ca-certificates -y --allow-unauthenticated
 RUN apt-get -y install sudo uuid jq python-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
     pip install --upgrade awscli
 

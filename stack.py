@@ -5,14 +5,17 @@ from command_git import git
 import gitlab_common
 import jenkins_common
 
+
 @click.group()
 def cli():
     pass
+
 
 @click.command()
 def clean():
     gitlab_common.deleteRepos()
     jenkins_common.clearEnvVars()
+
 
 cli.add_command(jenkins)
 cli.add_command(git)

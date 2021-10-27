@@ -1,7 +1,6 @@
 import subprocess
 import sys
 import requests
-import json
 import os
 import time
 import boto3
@@ -75,10 +74,11 @@ def getContainerPort(service, port="3000"):
 
 
 def execute(command=[]):
-    print(command)
+    print("executing " + command)
     path = os.path.abspath(__file__)
     dir_path = os.path.dirname(path)
     dir_path = os.path.abspath(dir_path + '/..')
+    print("executing in path " + dir_path)
     process = subprocess.Popen(command, cwd=dir_path, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     # Poll process for new output until finished
@@ -91,11 +91,10 @@ def execute(command=[]):
 
     output = process.communicate()[0]
     exitCode = process.returncode
-
     if (exitCode == 0):
         return output
     else:
-        raise subprocess.ProcessException(command, exitCode, output)
+        raise subprocess.CalledProcessError(exitCode, command, output)
 
 
 def aws_put_secure_string(name, value):

@@ -1,6 +1,7 @@
 from __future__ import print_function
 import requests
 from docker_jenkins_utils import common
+from docker_jenkins_utils.common import execute
 from jinja2 import Environment, FileSystemLoader
 import os
 import json
@@ -277,6 +278,11 @@ def prepareSession():
     }
 
 
+def clearGitConfig():
+    execute("docker-compose exec -T jenkins rm -f /var/jenkins_home/.gitconfig")
+
+
 def clearAll():
     clearEnvVars()
     clearAllJobs()
+    clearGitConfig()
