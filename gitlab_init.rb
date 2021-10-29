@@ -12,3 +12,7 @@ if !found
     token.set_token("skfj2348yrhauewsdfisa");
     token.save!
 end
+if !User.exists?(username: ENV['GIT_USER']) then
+    u = User.create(username: ENV['GIT_USER'], name:'sriddell', email:'no@none.net',password: ENV['GIT_PASSWORD'], skip_confirmation: true)
+    u.save!
+end

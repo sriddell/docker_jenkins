@@ -9,6 +9,8 @@ services:
         gitlab_rails['gitlab_shell_ssh_port'] = 2224
         gitlab_rails['initial_root_password'] = "password"
         gitlab_rails['store_initial_root_password'] = true
+    env_file:
+      - "../git.env"
     ports:
       - '8000:80'
       - '2224:22'
@@ -34,6 +36,8 @@ services:
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+    env_file:
+      - "../git.env"
 
   verdaccio:
     build:
@@ -48,7 +52,7 @@ services:
       - '8081:8081'
 
   aws:
-    image: localstack/localstack:0.12.17 
+    image: localstack/localstack:0.12.17
     environment:
       - SERVICES=s3,ssm
     ports:
