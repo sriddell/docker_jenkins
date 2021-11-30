@@ -3,7 +3,7 @@ set +x
 set -e
 cd /tmp
 if ! [ ${CI_DOCKER_VERSION} ]; then
-    CI_DOCKER_VERSION=18.09.9
+    CI_DOCKER_VERSION=20.10.3
 fi
 echo "installing docker client binary version $CI_DOCKER_VERSION"
 curl -L https://download.docker.com/linux/static/stable/x86_64/docker-$CI_DOCKER_VERSION.tgz -o docker.tgz
