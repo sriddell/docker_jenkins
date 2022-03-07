@@ -1,3 +1,5 @@
 FROM verdaccio/verdaccio
 
 COPY ./verdaccio.yaml /verdaccio/conf/config.yaml
+
+RUN echo 'jenkins:Hz.l1//St.OJ6:autocreated 2022-03-04T21:12:52.367Z' > /opt/verdaccio/htpasswd
