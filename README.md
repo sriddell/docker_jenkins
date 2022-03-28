@@ -22,12 +22,15 @@ git
 workflow-aggregator:2.2
 cloudbees-credentials:3.3
 tap:2.0.1
-matrix-auth:1.5
+matrix-auth:latest
 mask-passwords:2.8
 credentials-binding:1.13
 credentials:2.1.17
 xunit:1.102
+
 ```
+
+NOTE: the plugins list must contain a compatible version of matrix-auth, as the JCasc config uses this to setup the mock slave node.
 
 Create a python 3.6+ virtualenv and activate it, then
 

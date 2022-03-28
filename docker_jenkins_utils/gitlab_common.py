@@ -25,9 +25,7 @@ def getRepos():
     url = gitLabUrl()
     headers = {'PRIVATE-TOKEN': token}
     url = url + "projects"
-    print(url)
     resp = requests.get(url, headers=headers)
-    print(resp)
     return resp.json()
 
 

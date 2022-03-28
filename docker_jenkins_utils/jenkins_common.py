@@ -252,6 +252,7 @@ def executeScript(script):
     headers = result['headers']
     headers.update({"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"})
     r = session.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
+
     if r.status_code != 200:
         raise Exception("Failed to run script " + script)
 

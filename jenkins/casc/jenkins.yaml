@@ -1,0 +1,73 @@
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              id: git_read_only
+              username: ${GIT_USER}
+              password: ${GIT_PASSWORD}
+              scope: GLOBAL
+          - usernamePassword:
+              id: jenkins
+              username: ${JENKINS_USER}
+              password: ${JENKINS_PASS}
+              scope: GLOBAL
+
+jenkins:
+  labelAtoms:
+  - name: "master"
+  - name: "ec2-worker-u20-graviton"
+  nodes:
+  - permanent:
+      labelString: "ec2-worker-u20-graviton"
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: true
+            internalDir: "/home/jenkins/workspace/remoting"
+      mode: EXCLUSIVE
+      name: "ec2-worker-u20-graviton"
+      remoteFS: "//home/jenkins/workspace"
+      retentionStrategy: "always"
+  # - permanent:
+  #     labelString: "master"
+  #     numExecutors: 4
+  agentProtocols:
+      # - "Diagnostic-Ping"
+      - "JNLP4-connect"
+      # - "Ping"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+  #authorizationStrategy: unsecured
+  authorizationStrategy:
+    globalMatrix:
+      permissions:
+        - "Overall/Read:anonymous"
+        - "Agent/Connect:anonymous"
+        - "Overall/Administer:admin"
+        - "Overall/Read:admin"
+        - "Credentials/Create:admin"
+        - "Credentials/Delete:admin"
+        - "Credentials/ManageDomains:admin"
+        - "Credentials/Update:admin"
+        - "Job/Build:admin"
+        - "Job/Cancel:admin"
+        - "Job/Configure:admin"
+        - "Job/Create:admin"
+        - "Job/Delete:admin"
+        - "Job/Discover:admin"
+        - "Job/Move:admin"
+        - "Job/Read:admin"
+        - "Job/Workspace:admin"
+        - "Run/Delete:admin"
+        - "Run/Replay:admin"
+        - "Run/Update:admin"
+        - "Artifactory/Release:admin"
+
+
+
