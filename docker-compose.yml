@@ -23,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-jenkins
+      args:
+        CACHEBUST: 2
     depends_on:
       - gitlab
     ports:
@@ -39,6 +41,22 @@ services:
     env_file:
       - "../git.env"
 
+  jenkins-node:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    hostname: docker-node
+    depends_on:
+      - jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-node-workspace-volume:/workspace
+    environment:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+        AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+
   verdaccio:
     build:
       context: .
@@ -54,7 +72,7 @@ services:
   aws:
     image: localstack/localstack:0.12.17
     environment:
-      - SERVICES=s3,ssm
+      - SERVICES=s3,ssm,sqs
     ports:
       - '4566:4566'
 
@@ -65,14 +83,11 @@ services:
     ports:
       - "8082:80"
 
-  docker-registry:
-    image: registry:2
-    ports:
-      - 5000:5000
 
 
 volumes:
   jenkins-workspace-volume:
+  jenkins-node-workspace-volume:
   gitlab-config:
   gitlab-log:
   gitlab-data:

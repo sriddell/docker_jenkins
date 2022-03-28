@@ -1,0 +1,34 @@
+FROM 434313288222.dkr.ecr.us-east-1.amazonaws.com/golden-images/docker-ubuntu-openjdk-11.x:latest
+
+RUN touch /node.txt
+
+RUN apt-get update
+RUN apt-get upgrade ca-certificates -y --allow-unauthenticated
+RUN apt-get -y install openssh-server wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
+    pip install --upgrade awscli
+COPY sshd_config /etc/ssh/sshd_config
+
+ARG CACHEBUST=1
+
+RUN adduser jenkins
+RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
+RUN groupadd docker
+#Put jenkins in needed groups to access docker
+RUN adduser jenkins docker
+RUN adduser jenkins users
+RUN mkdir -p /var/jenkins_home
+RUN chown jenkins:jenkins /var/jenkins_home
+
+USER jenkins
+
+
+RUN mkdir -p /home/jenkins/workspace/remoting
+COPY agent.jar /home/jenkins/agent.jar
+COPY start-node.sh /home/jenkins/start-node.sh
+USER root
+RUN chmod +x /home/jenkins/start-node.sh
+RUN chown jenkins:jenkins /home/jenkins/start-node.sh
+USER jenkins
+
+
+CMD ["/home/jenkins/start-node.sh"]

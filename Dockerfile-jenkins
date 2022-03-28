@@ -11,16 +11,18 @@ RUN groupadd docker
 
 ARG CACHEBUST=1
 
+
 ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
     cd /tmp && \
     ./install_docker.sh
 
-#RUN touch /var/run/docker.sock
-#RUN chown root:docker /var/run/docker.sock
+RUN mkdir -p /usr/libexec/docker/cli-plugins
+RUN wget https://github.com/docker/buildx/releases/download/v0.8.1/buildx-v0.8.1.linux-amd64 -O /usr/libexec/docker/cli-plugins/docker-buildx
+RUN chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
+RUN docker buildx version
 
 #The install-plugins.sh in the base image appears to have bugs, replacing it with a working one
-
 
 #We can't install plugins or anything in jenkins home as part of the docker build, because it affects the jenkins home,
 # which is a VOLUME in the parent image so downstream builds can't modify it.
@@ -49,6 +51,7 @@ RUN mkdir /var/jenkins_home/workspace
 COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 COPY ./jenkins/casc/credentials.yaml /casc_configs
+COPY ./jenkins/casc/nodes.yaml /casc_configs
 #Set username, password, and updates URL
 ENV JENKINS_USER admin
 ENV JENKINS_PASS admin
@@ -62,8 +65,6 @@ RUN chown jenkins:jenkins /casc_configs
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 
 #Add bootstrapping scripts and configuration
-COPY ./jenkins/executors.groovy /usr/share/jenkins/ref/init.groovy.d/
-COPY ./jenkins/default-user.groovy /usr/share/jenkins/ref/init.groovy.d/
 
 
 
