@@ -9,8 +9,6 @@ RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
 RUN groupadd docker
 
-ARG CACHEBUST=1
-
 
 ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \
@@ -28,6 +26,7 @@ RUN docker buildx version
 # which is a VOLUME in the parent image so downstream builds can't modify it.
 # So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
 #installs the plugins at startup, then invokes the original startup script.
+ARG CACHEBUST=1
 RUN mv /usr/local/bin/jenkins.sh /usr/local/bin/jenkins_orig.sh
 COPY ./startup.sh /usr/local/bin/jenkins.sh
 RUN chmod +x /usr/local/bin/jenkins.sh
@@ -50,8 +49,7 @@ RUN mkdir /var/jenkins_home/workspace
 
 COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
-COPY ./jenkins/casc/credentials.yaml /casc_configs
-COPY ./jenkins/casc/nodes.yaml /casc_configs
+COPY ./jenkins/casc/jenkins.yaml /casc_configs
 #Set username, password, and updates URL
 ENV JENKINS_USER admin
 ENV JENKINS_PASS admin
@@ -62,7 +60,7 @@ RUN chown jenkins:jenkins /casc_configs
 
 
 # Skip initial setup
-ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
 
 
 
