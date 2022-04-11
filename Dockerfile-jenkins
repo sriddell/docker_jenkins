@@ -62,9 +62,8 @@ RUN chown jenkins:jenkins /casc_configs
 
 
 # Skip initial setup
-ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true
 
-#Add bootstrapping scripts and configuration
 
 
 
