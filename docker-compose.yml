@@ -56,6 +56,8 @@ services:
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+    env_file:
+      - "../git.env"
 
   verdaccio:
     build:
@@ -72,7 +74,7 @@ services:
   aws:
     image: localstack/localstack:0.12.17
     environment:
-      - SERVICES=s3,ssm,sqs
+      - SERVICES=s3,ssm,sqs,secretsmanager
     ports:
       - '4566:4566'
 

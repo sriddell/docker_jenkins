@@ -107,6 +107,15 @@ def aws_put_secure_string(name, value):
     )
 
 
+def aws_put_secrets_manager_string(name, value):
+    client = boto3.client('secretsmanager', endpoint_url=awsEndpointUrl(), region_name='us-east-1')
+    client.create_secret(
+        Name=name,
+        SecretString=value,
+        ForceOverwriteReplicaSecret=True
+    )
+
+
 def reset_verdaccio():
     execute("docker-compose kill verdaccio")
     execute("docker-compose rm -f verdaccio")

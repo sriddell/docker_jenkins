@@ -16,7 +16,7 @@ RUN chmod +x /tmp/install_docker.sh && \
     ./install_docker.sh
 
 RUN mkdir -p /usr/libexec/docker/cli-plugins
-RUN wget https://github.com/docker/buildx/releases/download/v0.8.1/buildx-v0.8.1.linux-amd64 -O /usr/libexec/docker/cli-plugins/docker-buildx
+RUN wget -q https://github.com/docker/buildx/releases/download/v0.8.1/buildx-v0.8.1.linux-amd64 -O /usr/libexec/docker/cli-plugins/docker-buildx
 RUN chmod +x /usr/libexec/docker/cli-plugins/docker-buildx
 RUN docker buildx version
 
@@ -60,7 +60,7 @@ RUN chown jenkins:jenkins /casc_configs
 
 
 # Skip initial setup
-ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.LAUNCH_DIAGNOSTICS=true
 
 
 
