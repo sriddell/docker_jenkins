@@ -4,8 +4,7 @@ RUN touch /node.txt
 
 RUN apt-get update
 RUN apt-get upgrade ca-certificates -y --allow-unauthenticated
-RUN apt-get -y install openssh-server git curl wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
-    pip install --upgrade awscli
+RUN apt-get -y install openssh-server git curl wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
 COPY sshd_config /etc/ssh/sshd_config
 ADD ./install_docker.sh /tmp
 RUN chmod +x /tmp/install_docker.sh && \

@@ -3,8 +3,7 @@ USER root
 
 RUN apt-get update
 RUN apt-get upgrade ca-certificates -y --allow-unauthenticated
-RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools && \
-    pip install --upgrade awscli
+RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
 RUN groupadd docker
