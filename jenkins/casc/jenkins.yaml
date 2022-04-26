@@ -16,6 +16,7 @@ credentials:
 jenkins:
   labelAtoms:
   - name: "master"
+  - name: "ec2-worker-u18-medium"
   - name: "ec2-worker-u20-graviton"
   nodes:
   - permanent:
@@ -28,6 +29,18 @@ jenkins:
             internalDir: "/home/jenkins/workspace/remoting"
       mode: EXCLUSIVE
       name: "ec2-worker-u20-graviton"
+      remoteFS: "//home/jenkins/workspace"
+      retentionStrategy: "always"
+  - permanent:
+      labelString: "ec2-worker-u18-medium"
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: true
+            internalDir: "/home/jenkins/workspace/remoting"
+      mode: EXCLUSIVE
+      name: "ec2-worker-u18-medium"
       remoteFS: "//home/jenkins/workspace"
       retentionStrategy: "always"
   # - permanent:

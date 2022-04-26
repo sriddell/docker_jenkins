@@ -41,7 +41,7 @@ services:
     env_file:
       - "../git.env"
 
-  jenkins-node:
+  jenkins-graviton:
     build:
       context: .
       dockerfile: Dockerfile-node
@@ -50,12 +50,32 @@ services:
       - jenkins
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins-node-workspace-volume:/workspace
+      - jenkins-graviton-workspace-volume:/workspace
     environment:
         AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+        WORKER_NAME: ec2-worker-u20-graviton
+    env_file:
+      - "../git.env"
+
+  jenkins-amd64:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    hostname: docker-node
+    depends_on:
+      - jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-amd64-workspace-volume:/workspace
+    environment:
+        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+        AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+        WORKER_NAME: ec2-worker-u18-medium
     env_file:
       - "../git.env"
 
@@ -89,7 +109,8 @@ services:
 
 volumes:
   jenkins-workspace-volume:
-  jenkins-node-workspace-volume:
+  jenkins-graviton-workspace-volume:
+  jenkins-amd64-workspace-volume:
   gitlab-config:
   gitlab-log:
   gitlab-data:

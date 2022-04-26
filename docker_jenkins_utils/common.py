@@ -107,6 +107,14 @@ def aws_put_secure_string(name, value):
     )
 
 
+def aws_create_s3_bucket(name):
+    client = boto3.client('s3', endpoint_url=awsEndpointUrl(), region_name='us-east-1')
+    client.create_bucket(
+        ACL='private',
+        Bucket=name
+    )
+
+
 def aws_put_secrets_manager_string(name, value):
     client = boto3.client('secretsmanager', endpoint_url=awsEndpointUrl(), region_name='us-east-1')
     client.create_secret(

@@ -16,7 +16,6 @@ def addSshKey(key):
     url = gitLabUrl() + "user/keys"
     headers = {'PRIVATE-TOKEN': token}
     params = {'title': 'main', 'key': key}
-    print(url)
     print(requests.post(url, headers=headers, params=params))
 
 

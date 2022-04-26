@@ -71,9 +71,9 @@ def getConsole(job, branch, buildId):
     headers = result['headers']
     url = None
     if branch is not None:
-        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/consoleFull"
+        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/consoleText"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleFull"
+        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleText"
     resp = session.get(url, headers=headers)
     if resp.status_code == 200:
         return resp.text
@@ -91,7 +91,6 @@ def getArtifact(job, branch, buildId, relativePath):
 
 def proceed(job, branch, buildId, inputId):
     url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/proceedEmpty"
-    print(url)
     resp = requests.post(url)
     if resp.status_code != 200:
         raise Exception("Failed to proceed" + str(resp.status_code))
@@ -100,7 +99,6 @@ def proceed(job, branch, buildId, inputId):
 
 def abort(job, branch, buildId, inputId):
     url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/abort"
-    print(url)
     resp = requests.post(url)
     if resp.status_code != 200:
         raise Exception("Failed to abort" + str(resp.status_code))
