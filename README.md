@@ -77,7 +77,7 @@ xunit:1.102
 pipeline-model-definition
 ```
 
-Then, to load a separate project directory into gitlab and create and run a project for it:
+Then, to load a separate project directory into gitea and create and run a project for it:
 
 ```
 python run_project.py <directory_containing_jenkinsfile>

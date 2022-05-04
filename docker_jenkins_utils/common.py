@@ -138,11 +138,6 @@ def reset_aws():
     checkHealth("aws", "4566")
 
 
-def getGitlabToken():
-    # This is now created during gitlab startup via the gitlab_init.rb file
-    return 'skfj2348yrhauewsdfisa'
-
-
 def gitUrl():
     url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
     return url

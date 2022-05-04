@@ -1,7 +1,7 @@
 from __future__ import print_function
 import requests
 from requests.auth import HTTPBasicAuth
-from docker_jenkins_utils.common import gitUrl, getGitlabToken
+from docker_jenkins_utils.common import gitUrl
 
 
 def getBasicAuth():

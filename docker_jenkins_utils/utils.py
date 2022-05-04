@@ -1,4 +1,4 @@
-import docker_jenkins_utils.gitlab_common as git
+import docker_jenkins_utils.gitea_common as git
 import os
 import shutil
 from docker_jenkins_utils.common import getGitInfo

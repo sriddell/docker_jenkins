@@ -2,7 +2,7 @@ from __future__ import print_function
 import click
 from command_jenkins import jenkins
 from command_git import git
-import gitlab_common
+import gitea_common
 import jenkins_common
 
 
@@ -13,7 +13,7 @@ def cli():
 
 @click.command()
 def clean():
-    gitlab_common.deleteRepos()
+    gitea_common.deleteRepos()
     jenkins_common.clearEnvVars()
 
 
