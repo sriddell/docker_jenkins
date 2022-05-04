@@ -69,7 +69,7 @@ def getDockerHostAddr():
 
 
 def getContainerPort(service, port="3000"):
-    output = check_output(['docker-compose', 'port', service, str(port)])
+    output = check_output(['docker-compose', 'port', service, str(port)]).strip()
     return output.split(':')[1].strip()
 
 
@@ -143,15 +143,15 @@ def getGitlabToken():
     return 'skfj2348yrhauewsdfisa'
 
 
-def gitLabUrl():
-    url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/api/v4/"
+def gitUrl():
+    url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
     return url
 
 
 def getGitInfo():
     info = {}
-    info['baseUrlWithCreds'] = "http://root:password@" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
-    info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitlab", 80) + "/root"
+    info['baseUrlWithCreds'] = "http://root:admin@" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
+    info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
     return info
 
 

@@ -1,38 +1,58 @@
 from __future__ import print_function
 import requests
-from docker_jenkins_utils.common import gitLabUrl, getGitlabToken
+from requests.auth import HTTPBasicAuth
+from docker_jenkins_utils.common import gitUrl, getGitlabToken
+
+
+def getBasicAuth():
+    return HTTPBasicAuth('root', 'admin')
 
 
 def createRepo(name):
-    token = getGitlabToken()
-    url = gitLabUrl() + "projects"
-    headers = {'PRIVATE-TOKEN': token}
-    params = {'name': name, 'visibility': 'internal'}
-    requests.post(url, headers=headers, params=params)
+    url = gitUrl() + "user/repos"
+    payload = '''{
+        "auto_init": false,
+        "default_branch": "master",
+        "name": "''' + name + '''",
+        "private": false,
+        "trust_model": "default"
+    }'''
+    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+    resp = requests.post(url=url, headers=headers, auth=getBasicAuth(), data=payload)
+    if resp.status_code != 201:
+        raise Exception("createRepo:" + str(resp.status_code) + ' ' + resp.text)
 
 
-def addSshKey(key):
-    token = getGitlabToken()
-    url = gitLabUrl() + "user/keys"
-    headers = {'PRIVATE-TOKEN': token}
-    params = {'title': 'main', 'key': key}
-    print(requests.post(url, headers=headers, params=params))
+def addSshKey(key, repo):
+    url = gitUrl() + "repos/root/" + repo + "/keys"
+    headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+    payload = '''{
+        "key": "''' + key + '''",
+        "read_only": false,
+        "title": "gitops"
+    }'''
+    resp = requests.post(url=url, headers=headers, auth=getBasicAuth(), data=payload)
+    if resp.status_code != 201:
+        raise Exception("createRepo:" + str(resp.status_code) + ' ' + resp.text)
 
 
 def getRepos():
-    token = getGitlabToken()
-    url = gitLabUrl()
-    headers = {'PRIVATE-TOKEN': token}
-    url = url + "projects"
-    resp = requests.get(url, headers=headers)
+    url = gitUrl()
+    headers = {'accept': 'application/json'}
+    url = url + "repos/search"
+    resp = requests.get(url, auth=getBasicAuth(), headers=headers)
+    if resp.status_code != 200:
+        raise Exception("getRepos:" + str(resp.status_code) + ' ' + resp.text)
     return resp.json()
 
 
 def deleteRepos():
     repos = getRepos()
-    for repo in repos:
-        token = getGitlabToken()
-        url = gitLabUrl()
-        headers = {'PRIVATE-TOKEN': token}
-        url = url + "projects/" + str(repo['id'])
-        requests.delete(url, headers=headers)
+    for repo in repos['data']:
+        print(repo)
+        url = gitUrl()
+        url = url + "repos/" + str(repo['owner']['login']) + '/' + repo['name']
+        headers = {'accept': 'application/json'}
+        resp = requests.delete(url, auth=getBasicAuth(), headers=headers)
+        if resp.status_code != 204:
+            raise Exception("deleteRepos:" + str(resp.status_code) + ' ' + resp.text)

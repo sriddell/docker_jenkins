@@ -50,8 +50,8 @@ COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 COPY ./jenkins/casc/jenkins.yaml /casc_configs
 #Set username, password, and updates URL
-ENV JENKINS_USER admin
-ENV JENKINS_PASS admin
+ENV JENKINS_USER jenkins_ro
+ENV JENKINS_PASS jenkins_ro
 ENV JENKINS_UC https://updates.jenkins.io
 
 

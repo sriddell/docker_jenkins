@@ -34,7 +34,8 @@ if len(sys.argv) > 1:
 checkHealth("jenkins", "8080", "")
 checkHealth("verdaccio", "4873", "")
 checkHealth("artifactory", "8081", "")
-checkHealth("gitlab", "80", "")
+checkHealth("gitea", "8889", "")
 checkHealth("aws", "4566")
 
-execute("docker-compose exec gitlab gitlab-rails runner /gitlab_init.rb")
+execute("docker-compose exec --user git gitea gitea admin user create --admin --username root --password admin --email admin@example.com")
+execute("docker-compose exec --user git gitea gitea admin user create --username jenkins_ro --password jenkins_ro --email jenkins_rosts@example.com")
