@@ -21,8 +21,8 @@ services:
       - GITEA__server__ROOT_URL=http://localhost:8889
       - GITEA__server__HTTP_PORT=8889
     restart: always
-    volumes:
-      - gitea-volume:/data
+#    volumes:
+#      - gitea-volume:/data
     #   - :/etc/timezone:ro
     #   - :/etc/localtime:ro
     ports:

@@ -33,7 +33,7 @@ def addSshKey(key, repo):
     }'''
     resp = requests.post(url=url, headers=headers, auth=getBasicAuth(), data=payload)
     if resp.status_code != 201:
-        raise Exception("createRepo:" + str(resp.status_code) + ' ' + resp.text)
+        raise Exception("addSshKey:" + str(resp.status_code) + ' ' + resp.text)
 
 
 def getRepos():
