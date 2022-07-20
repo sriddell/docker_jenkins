@@ -14,13 +14,14 @@ credentials:
               scope: GLOBAL
 
 jenkins:
+  numExecutors: 0
   labelAtoms:
-  - name: "master"
   - name: "ec2-worker-u18-medium"
   - name: "ec2-worker-u20-graviton"
   nodes:
   - permanent:
       labelString: "ec2-worker-u20-graviton"
+      numExecutors: 2
       launcher:
         jnlp:
           workDirSettings:
@@ -33,6 +34,7 @@ jenkins:
       retentionStrategy: "always"
   - permanent:
       labelString: "ec2-worker-u18-medium"
+      numExecutors: 2
       launcher:
         jnlp:
           workDirSettings:
@@ -43,13 +45,8 @@ jenkins:
       name: "ec2-worker-u18-medium"
       remoteFS: "//home/jenkins/workspace"
       retentionStrategy: "always"
-  # - permanent:
-  #     labelString: "master"
-  #     numExecutors: 4
   agentProtocols:
-      # - "Diagnostic-Ping"
       - "JNLP4-connect"
-      # - "Ping"
   securityRealm:
     local:
       allowsSignup: false

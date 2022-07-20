@@ -14,7 +14,6 @@ cp /tmp/artifactory_plugin.xml /var/jenkins_home/org.jfrog.hudson.ArtifactoryBui
 chown jenkins:jenkins /var/jenkins_home/org.jfrog.hudson.ArtifactoryBuilder.xml
 
 mkdir -p /var/jenkins_home/.ssh
-ssh-keyscan -H gitea >> /var/jenkins_home/.ssh/known_hosts
 sudo chown jenkins:jenkins /var/jenkins_home/.ssh
 sudo chown jenkins:jenkins /var/run/docker.sock
 
