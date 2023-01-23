@@ -16,11 +16,11 @@ credentials:
 jenkins:
   numExecutors: 0
   labelAtoms:
-  - name: "ec2-worker-u18-medium"
-  - name: "ec2-worker-u20-graviton"
+  - name: "ec2-worker-u20amd64-medium"
+  - name: "ec2-worker-u20arm-medium"
   nodes:
   - permanent:
-      labelString: "ec2-worker-u20-graviton"
+      labelString: "ec2-worker-u20arm-medium"
       numExecutors: 2
       launcher:
         jnlp:
@@ -29,11 +29,11 @@ jenkins:
             failIfWorkDirIsMissing: true
             internalDir: "/home/jenkins/workspace/remoting"
       mode: EXCLUSIVE
-      name: "ec2-worker-u20-graviton"
+      name: "ec2-worker-u20arm-medium"
       remoteFS: "//home/jenkins/workspace"
       retentionStrategy: "always"
   - permanent:
-      labelString: "ec2-worker-u18-medium"
+      labelString: "ec2-worker-u20amd64-medium"
       numExecutors: 2
       launcher:
         jnlp:
@@ -42,7 +42,7 @@ jenkins:
             failIfWorkDirIsMissing: true
             internalDir: "/home/jenkins/workspace/remoting"
       mode: EXCLUSIVE
-      name: "ec2-worker-u18-medium"
+      name: "ec2-worker-u20amd64-medium"
       remoteFS: "//home/jenkins/workspace"
       retentionStrategy: "always"
   agentProtocols:

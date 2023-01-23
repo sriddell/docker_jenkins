@@ -77,7 +77,7 @@ services:
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-        WORKER_NAME: ec2-worker-u20-graviton
+        WORKER_NAME: ec2-worker-u20arm-medium
     env_file:
       - "../git.env"
 
@@ -96,7 +96,7 @@ services:
         AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
         AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
         AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-        WORKER_NAME: ec2-worker-u18-medium
+        WORKER_NAME: ec2-worker-u20amd64-medium
     env_file:
       - "../git.env"
 
@@ -108,7 +108,7 @@ services:
       - '4873:4873'
 
   artifactory:
-    image: docker.bintray.io/jfrog/artifactory-oss:latest
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.46.11
     ports:
       - '8081:8081'
 

@@ -1,12 +1,12 @@
-#Experimental jenkins image for testing pipelines-as-code
+# Experimental jenkins image for testing pipelines-as-code
 
-##Overview
+## Overview
 
-Builds jenkins into a container along with the workflow-aggregator plugin (for pipelines as code).  Based on the build for the official Jenkins docker image (https://github.com/jenkinsci/docker).
+Builds jenkins into a container along with the workflow-aggregator plugin (for pipelines as code).  Based on the build for the official Jenkins docker [image](https://github.com/jenkinsci/docker).
 
 Also sets the docker group ID to match that in a docker-machine VM, and installs docker client in the container (at runtime), so it can match the external.
 
-##Caveats
+## Caveats
 
 This is not meant to run in production - it is meant to run on developer hardware, or restricted/private hardware only for testing pipelines.
 
@@ -14,10 +14,11 @@ As such, the Jenkin's admin login is hardcoded as admin/admin.
 
 If you want to use it outside of a secure testing environment, you should remove the hardcoded password setting in artifactory_plugin.xml and provide a properly encoded value at runtime.
 
-##Running
+## Running
+
 In the directory above docker_jenkins, define a plugins.txt file that lists the plugins you want to be automatically installed in jenkins, e.g.
 
-```
+```txt
 git
 workflow-aggregator:2.2
 cloudbees-credentials:3.3
@@ -34,37 +35,36 @@ NOTE: the plugins list must contain a compatible version of matrix-auth, as the 
 
 Create a python 3.6+ virtualenv and activate it, then
 
-```
+```bash
 pip install -e docker_jenkins_utils
 ```
 
 Followed by
 
-```
+```bash
 ./up
 ```
 
 to bring up the environment.
 
-```
+```bash
 ./down
 ```
 
 will stop the environment.
 
-
-##Running projects manually
+## Running projects manually
 
 If you just want to run a Jenkinsfile based project manually, create a python 3.6+ virtualenv and activate it, then
 
-```
+```bash
 pip install -e docker_jenkins_utils
 pip install -r run_project_requirements.txt
 ```
 
 In the directory above docker_jenkins, define a plugins.txt file that lists the plugins you want to be automatically installed in jenkins, e.g.
 
-```
+```txt
 git
 workflow-aggregator:2.2
 cloudbees-credentials:3.3
@@ -79,7 +79,7 @@ pipeline-model-definition
 
 Then, to load a separate project directory into gitea and create and run a project for it:
 
-```
+```bash
 python run_project.py <directory_containing_jenkinsfile>
 ```
 
@@ -87,16 +87,15 @@ The directory_containing_jenkinsfile will be copied to a temporary directory, tu
 
 You can set global environment variables in jenkins by placing them into a .env file:
 
-```
+```bash
 FOO=BAR
 ```
 
 The run_project.py script will automatically search from the current directory upward for a .env file, and load any variables it finds as jenkins global environment variables which can be accessed by your Jenkinsfile.
 
-The Jenkins console is available on port 8080 wherever you docker daemon is running.  For example, if you are running a typical docker installation where containers are available at localhost, the http://localhost:8080 will take you to the jenkins console.  The default credentials are admin/admin.
+The Jenkins console is available on port 8080 wherever you docker daemon is running.  For example, if you are running a typical docker installation where containers are available at localhost, the [url](http://localhost:8080) will take you to the jenkins console.  The default credentials are admin/admin.
 
-
-##Caveats
+## Other things
 
 - in experimental stage
 - does not fully mimic DevOps production env; contains the minimum necessary to begin testing the jenkins-pipeline-docker.  Additional features will be added as needed.
