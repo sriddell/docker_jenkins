@@ -109,6 +109,8 @@ services:
 
   artifactory:
     image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.46.11
+    environment:
+      SKIP_VALIDATION_DISK_SPACE: "true"
     ports:
       - '8081:8081'
 
