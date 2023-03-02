@@ -1,6 +1,6 @@
-docker-compose kill jenkins && docker-compose rm -f jenkins
-docker-compose kill jenkins-graviton && docker-compose rm -f jenkins-graviton
-docker-compose kill jenkins-amd64 && docker-compose rm -f jenkins-amd64
-docker-compose kill db && docker-compose rm -f db
-docker-compose kill gitea && docker-compose rm -f gitea
+docker compose kill jenkins && docker compose rm -f jenkins
+docker compose kill jenkins-graviton && docker compose rm -f jenkins-graviton
+docker compose kill jenkins-amd64 && docker compose rm -f jenkins-amd64
+docker compose kill db && docker compose rm -f db
+docker compose kill gitea && docker compose rm -f gitea
 ./up

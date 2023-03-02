@@ -1,1 +1,1 @@
-docker-compose down --volumes && docker-compose rm -f -v
+docker compose down --remove-orphans --volumes && docker compose rm -f -v

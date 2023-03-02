@@ -69,7 +69,7 @@ def getDockerHostAddr():
 
 
 def getContainerPort(service, port="3000"):
-    output = check_output(['docker-compose', 'port', service, str(port)]).strip()
+    output = check_output(['docker',  'compose', 'port', service, str(port)]).strip()
     return output.split(':')[1].strip()
 
 
@@ -125,16 +125,16 @@ def aws_put_secrets_manager_string(name, value):
 
 
 def reset_verdaccio():
-    execute("docker-compose kill verdaccio")
-    execute("docker-compose rm -f verdaccio")
-    execute("docker-compose up -d verdaccio")
+    execute("docker compose kill verdaccio")
+    execute("docker compose rm -f verdaccio")
+    execute("docker compose up -d verdaccio")
     checkHealth("verdaccio", "4873", "")
 
 
 def reset_aws():
-    execute("docker-compose kill aws")
-    execute("docker-compose rm -f aws")
-    execute("docker-compose up -d aws")
+    execute("docker compose kill aws")
+    execute("docker compose rm -f aws")
+    execute("docker compose up -d aws")
     checkHealth("aws", "4566")
 
 

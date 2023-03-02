@@ -20,13 +20,13 @@ else:
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'all':
-        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins"
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins"
         execute(cmd)
-        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-graviton"
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-graviton"
         execute(cmd)
-        cmd = "docker-compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-amd64"
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-amd64"
         execute(cmd)
-        execute("docker-compose up -d")
+        execute("docker compose up -d")
     if sys.argv[1] == 'reset-verdaccio':
         reset_verdaccio()
 
@@ -37,5 +37,5 @@ checkHealth("artifactory", "8081", "")
 checkHealth("gitea", "8889", "")
 checkHealth("aws", "4566")
 
-execute("docker-compose exec --user git gitea gitea admin user create --admin --username root --password admin --email admin@example.com")
-execute("docker-compose exec --user git gitea gitea admin user create --username jenkins_ro --password jenkins_ro --email jenkins_rosts@example.com")
+execute("docker compose exec --user git gitea gitea admin user create --admin --username root --password admin --email admin@example.com")
+execute("docker compose exec --user git gitea gitea admin user create --username jenkins_ro --password jenkins_ro --email jenkins_rosts@example.com")

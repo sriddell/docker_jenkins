@@ -278,7 +278,7 @@ def prepareSession():
 
 
 def clearGitConfig():
-    execute("docker-compose exec -T jenkins rm -f /var/jenkins_home/.gitconfig")
+    execute("docker compose exec -T jenkins rm -f /var/jenkins_home/.gitconfig")
 
 
 def clearAll():
