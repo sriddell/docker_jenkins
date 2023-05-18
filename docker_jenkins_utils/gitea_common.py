@@ -49,7 +49,6 @@ def getRepos():
 def deleteRepos():
     repos = getRepos()
     for repo in repos['data']:
-        print(repo)
         url = gitUrl()
         url = url + "repos/" + str(repo['owner']['login']) + '/' + repo['name']
         headers = {'accept': 'application/json'}
