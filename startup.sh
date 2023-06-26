@@ -5,7 +5,7 @@ rm -f /var/jenkins_home/.ssh/known_hosts # reset known hosts in case gitea, etc 
 set -e
 echo "installing plugins"
 cp /usr/share/jenkins/ref/plugins.txt /var/jenkins_home/plugins.txt
-/usr/local/bin/install-plugins.sh < /var/jenkins_home/plugins.txt
+jenkins-plugin-cli -f /var/jenkins_home/plugins.txt
 rm /var/jenkins_home/plugins.txt
 #echo "configuration-as-code" >> /usr/local/bin/install-plugins.sh
 echo "plugins installed"

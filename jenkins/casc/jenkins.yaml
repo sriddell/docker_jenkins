@@ -74,10 +74,10 @@ jenkins:
         - "Job/Move:admin"
         - "Job/Read:admin"
         - "Job/Workspace:admin"
-        - "Run/Delete:admin"
-        - "Run/Replay:admin"
-        - "Run/Update:admin"
-        - "Artifactory/Release:admin"
+        # - "Run/Delete:admin"
+        # - "Run/Replay:admin"
+        # - "Run/Update:admin"
+        # - "Artifactory/Release:admin"
 
 
 

@@ -1,8 +1,8 @@
-FROM jenkins/jenkins:2.332.3
+FROM jenkins/jenkins:2.346.3
 USER root
 
 RUN apt-get update
-RUN apt-get upgrade ca-certificates -y --allow-unauthenticated
+RUN apt-get upgrade ca-certificates -y --allow-unauthenticated libedit-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev 
 RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
