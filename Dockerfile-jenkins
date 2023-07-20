@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.346.3
+FROM jenkins/jenkins:2.332.4
 USER root
 
 RUN apt-get update
@@ -46,7 +46,7 @@ ENV CASC_JENKINS_CONFIG=/casc_configs
 USER jenkins
 RUN mkdir /var/jenkins_home/workspace
 
-COPY ./build/plugins.txt /usr/share/jenkins/ref/plugins.txt
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 
 COPY ./jenkins/casc/jenkins.yaml /casc_configs
 #Set username, password, and updates URL
