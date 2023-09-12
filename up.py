@@ -22,10 +22,14 @@ if len(sys.argv) > 1:
     if sys.argv[1] == 'all':
         cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins"
         execute(cmd)
-        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-graviton"
-        execute(cmd)
         cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-amd64"
         execute(cmd)
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-graviton-u22"
+        execute(cmd)
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " jenkins-amd64-u22"
+        execute(cmd)
+        cmd = "docker compose build --build-arg CACHEBUST=" + str(calendar.timegm(time.gmtime())) + " --build-arg DOCKER_HOST_ADDR=" + str(getDockerHostAddr()) + " custom-node"
+        execute(cmd)        
         execute("docker compose up -d")
     if sys.argv[1] == 'reset-verdaccio':
         reset_verdaccio()

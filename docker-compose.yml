@@ -1,10 +1,8 @@
-version: '3'
+---
+version: "3"
 services:
   gitea:
     image: gitea/gitea:1.16.7
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile-gitea
     container_name: gitea
     environment:
       - GITEA__security__INSTALL_LOCK=true
@@ -21,16 +19,11 @@ services:
       - GITEA__server__ROOT_URL=http://localhost:8889
       - GITEA__server__HTTP_PORT=8889
     restart: always
-#    volumes:
-#      - gitea-volume:/data
-    #   - :/etc/timezone:ro
-    #   - :/etc/localtime:ro
     ports:
-      - "8889:8889"
-      - "222:22"
+      - 8889:8889
+      - 222:22
     depends_on:
       - db
-
   db:
     image: postgres:14
     restart: always
@@ -38,8 +31,6 @@ services:
       - POSTGRES_USER=gitea
       - POSTGRES_PASSWORD=gitea
       - POSTGRES_DB=gitea
-
-
   jenkins:
     build:
       context: .
@@ -49,38 +40,17 @@ services:
     depends_on:
       - gitea
     ports:
-      - '8080:8080'
-      - '50000:50000'
+      - 8080:8080
+      - 50000:50000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      #- jenkins-workspace-volume:/var/jenkins_home/
     environment:
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
-        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
-        AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
     env_file:
-      - "../git.env"
-
-  jenkins-graviton:
-    build:
-      context: .
-      dockerfile: Dockerfile-node
-    hostname: docker-node
-    depends_on:
-      - jenkins
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins-graviton-workspace-volume:/workspace
-    environment:
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
-        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
-        AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-        WORKER_NAME: ec2-worker-u20arm-medium
-    env_file:
-      - "../git.env"
-
+      - ../git.env
   jenkins-amd64:
     build:
       context: .
@@ -92,46 +62,93 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins-amd64-workspace-volume:/workspace
     environment:
-        AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
-        AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
-        AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
-        AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-        WORKER_NAME: ec2-worker-u20amd64-medium
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+      WORKER_NAME: ec2-worker-u20amd64-medium
     env_file:
-      - "../git.env"
-
+      - ../git.env
+  jenkins-amd64-u22:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    hostname: docker-node
+    depends_on:
+      - jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-amd64-workspace-volume:/workspace
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+      WORKER_NAME: ec2-worker-u22amd64-medium
+    env_file:
+      - ../git.env
+  jenkins-graviton-u22:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    hostname: docker-node
+    depends_on:
+      - jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-graviton-workspace-volume:/workspace
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+      WORKER_NAME: ec2-worker-u22arm-medium
+    env_file:
+      - ../git.env
+  custom-node:
+    build:
+      context: .
+      dockerfile: Dockerfile-node
+    hostname: docker-node
+    depends_on:
+      - jenkins
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins-graviton-workspace-volume:/workspace
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+      WORKER_NAME: custom
+    env_file:
+      - ../git.env  
   verdaccio:
     build:
       context: .
       dockerfile: Dockerfile-verdaccio
     ports:
-      - '4873:4873'
-
+      - 4873:4873
   artifactory:
     image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.46.11
     environment:
       SKIP_VALIDATION_DISK_SPACE: "true"
     ports:
-      - '8081:8081'
-
+      - 8081:8081
   aws:
     image: localstack/localstack:1.4
     environment:
       - SERVICES=s3,ssm,sqs,secretsmanager
     ports:
-      - '4566:4566'
-
+      - 4566:4566
   kubeconfig-server:
     build:
       context: .
       dockerfile: Dockerfile-kubeconfig
     ports:
-      - "8082:80"
-
-
-
+      - 8082:80
 volumes:
-  jenkins-workspace-volume:
-  jenkins-graviton-workspace-volume:
-  jenkins-amd64-workspace-volume:
-  gitea-volume:
+  jenkins-workspace-volume: null
+  jenkins-graviton-workspace-volume: null
+  jenkins-amd64-workspace-volume: null
+  gitea-volume: null

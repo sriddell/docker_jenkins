@@ -17,21 +17,9 @@ jenkins:
   numExecutors: 0
   labelAtoms:
   - name: "ec2-worker-u20amd64-medium"
-  - name: "ec2-worker-u20arm-medium"
+  - name: "ec2-worker-u22amd64-medium"
+  - name: "ec2-worker-u22arm-medium"
   nodes:
-  - permanent:
-      labelString: "ec2-worker-u20arm-medium"
-      numExecutors: 2
-      launcher:
-        jnlp:
-          workDirSettings:
-            disabled: false
-            failIfWorkDirIsMissing: true
-            internalDir: "/home/jenkins/workspace/remoting"
-      mode: EXCLUSIVE
-      name: "ec2-worker-u20arm-medium"
-      remoteFS: "//home/jenkins/workspace"
-      retentionStrategy: "always"
   - permanent:
       labelString: "ec2-worker-u20amd64-medium"
       numExecutors: 2
@@ -45,6 +33,45 @@ jenkins:
       name: "ec2-worker-u20amd64-medium"
       remoteFS: "//home/jenkins/workspace"
       retentionStrategy: "always"
+  - permanent:
+      labelString: "ec2-worker-u22amd64-medium"
+      numExecutors: 2
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: true
+            internalDir: "/home/jenkins/workspace/remoting"
+      mode: EXCLUSIVE
+      name: "ec2-worker-u22amd64-medium"
+      remoteFS: "//home/jenkins/workspace"
+      retentionStrategy: "always"    
+  - permanent:
+      labelString: "ec2-worker-u22arm-medium"
+      numExecutors: 2
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: true
+            internalDir: "/home/jenkins/workspace/remoting"
+      mode: EXCLUSIVE
+      name: "ec2-worker-u22arm-medium"
+      remoteFS: "//home/jenkins/workspace"
+      retentionStrategy: "always"    
+  - permanent:
+      labelString: "custom"
+      numExecutors: 2
+      launcher:
+        jnlp:
+          workDirSettings:
+            disabled: false
+            failIfWorkDirIsMissing: true
+            internalDir: "/home/jenkins/workspace/remoting"
+      mode: EXCLUSIVE
+      name: "custom"
+      remoteFS: "//home/jenkins/workspace"
+      retentionStrategy: "always"                  
   agentProtocols:
       - "JNLP4-connect"
   securityRealm:
