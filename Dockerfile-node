@@ -1,4 +1,5 @@
 FROM 434313288222.dkr.ecr.us-east-1.amazonaws.com/golden-images/docker-ubuntu-openjdk-11.x:latest
+USER root
 
 RUN touch /node.txt
 
