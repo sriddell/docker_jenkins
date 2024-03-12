@@ -22,7 +22,7 @@ jenkins:
   nodes:
   - permanent:
       labelString: "ec2-worker-u20amd64-medium"
-      numExecutors: 2
+      numExecutors: 4
       launcher:
         jnlp:
           workDirSettings:
@@ -35,7 +35,7 @@ jenkins:
       retentionStrategy: "always"
   - permanent:
       labelString: "ec2-worker-u22amd64-medium"
-      numExecutors: 2
+      numExecutors: 4
       launcher:
         jnlp:
           workDirSettings:
@@ -48,7 +48,7 @@ jenkins:
       retentionStrategy: "always"    
   - permanent:
       labelString: "ec2-worker-u22arm-medium"
-      numExecutors: 2
+      numExecutors: 4
       launcher:
         jnlp:
           workDirSettings:
@@ -61,7 +61,7 @@ jenkins:
       retentionStrategy: "always"    
   - permanent:
       labelString: "custom"
-      numExecutors: 2
+      numExecutors: 4
       launcher:
         jnlp:
           workDirSettings:

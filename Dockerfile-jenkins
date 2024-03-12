@@ -31,8 +31,8 @@ COPY ./startup.sh /usr/local/bin/jenkins.sh
 RUN chmod +x /usr/local/bin/jenkins.sh
 
 #Put jenkins in needed groups to access docker
-RUN adduser jenkins docker
-RUN adduser jenkins users
+RUN usermod -a -G docker jenkins
+RUN usermod -a -G users jenkins
 
 COPY ./jenkins/artifactory_plugin.xml /tmp/artifactory_plugin.xml
 ARG DOCKER_HOST_ADDR

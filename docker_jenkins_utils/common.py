@@ -138,6 +138,13 @@ def reset_aws():
     checkHealth("aws", "4566")
 
 
+def reset_nodes():
+    for c in ['jenkins-amd64', 'jenkins-amd64-u22', 'jenkins-graviton-u22', 'custom-node']:
+        execute('docker compose kill ' + c)    
+        execute("docker compose rm -f " + c)
+        execute("docker compose up -d " + c)        
+
+
 def gitUrl():
     url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
     return url

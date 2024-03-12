@@ -36,7 +36,14 @@ def addPipelineJob(name, repoUrl, directory):
 
 
 def runJob(job, branch):
-    requests.post(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/build?delay=0sec")
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
+    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/build?delay=0sec"
+    print("running job=" + url)
+    r = session.post(url, headers=headers)
+    if r.status_code != 201:
+        raise Exception("Failed to start job " + url + "; status was " + str(r.status_code))
 
 
 def waitForBuild(job, branch=None):
@@ -78,7 +85,7 @@ def getConsole(job, branch, buildId):
     if resp.status_code == 200:
         return resp.text
     else:
-        raise Exception("Failed to retrieve console " + str(resp.status_code))
+        raise Exception("Failed to retrieve console for " + url + ': ' + str(resp.status_code))
 
 
 def getArtifact(job, branch, buildId, relativePath):
@@ -143,6 +150,18 @@ def runPipeline(job):
     r = session.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0", headers=headers)
     if r.status_code != 201:
         raise Exception("Failed to run pipeline " + str(r.status_code))
+    
+
+def deleteBuild(job, branch="master", number="1"):
+    result = prepareSession()
+    session = result['session']
+    headers = result['headers']
+    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + number + "/doDelete"
+    print("delete=" + url)
+    r = session.post(url, headers=headers)
+    print(r)
+    if r.status_code != 200:
+        raise Exception("Failed to delete build " + str(r.status_code))
 
 
 def addUsernamePasswordCredential(id, username, password):
