@@ -7,19 +7,29 @@ import os
 import json
 import time
 import urllib
+import jenkins
 
 
-def addJob(name, repoUrl):
+def addJob(folder_name, job_name, repoUrl):
     result = prepareSession()
     session = result['session']
     headers = result['headers']
     thisDir = os.path.dirname(os.path.abspath(__file__))
     j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
-    content = j2.get_template('templates/config.xml').render(name=name, repo_url=repoUrl)
+    content = j2.get_template('templates/config.xml').render(name=job_name, repo_url=repoUrl)
     headers.update({"Content-Type": "text/xml; charset=UTF-8"})
-    r = session.post(common.jenkinsUrl() + "createItem?name=" + name, data=content, headers=headers)
+    url = common.jenkinsUrl() + 'job/' + folder_name + '/createItem?name=' + job_name
+    r = session.post(url, data=content, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to add job; status was " + str(r.status_code))
+
+def createFolder(name):
+    try:
+        server = jenkins.Jenkins(common.jenkinsUrl(), username='admin', password='admin')
+        server.create_job(name, jenkins.EMPTY_FOLDER_XML)
+    except jenkins.JenkinsException as e:
+        print("Have jenkins exception")
+        print(e)
 
 
 def addPipelineJob(name, repoUrl, directory):
@@ -35,33 +45,37 @@ def addPipelineJob(name, repoUrl, directory):
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
 
-def runJob(job, branch):
+def runJob(folder, name, branch='master'):
     result = prepareSession()
     session = result['session']
     headers = result['headers']
-    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/build?delay=0sec"
+    url = common.jenkinsUrl() + "job/" + folder +  "/job/" + name + "/job/" + branch + "/build?delay=0sec"
     print("running job=" + url)
     r = session.post(url, headers=headers)
     if r.status_code != 201:
         raise Exception("Failed to start job " + url + "; status was " + str(r.status_code))
 
 
-def waitForBuild(job, branch=None):
-    buildId = waitForBuildToExist(job, branch)
+def waitForBuild(folder, job, branch=None, build_number=1):
+    # print('>>>> waiting for ' + folder + '/' + job + '/job/' + branch + '/' + str(build_number))
+    buildId = waitForBuildToExist(folder, job, branch, build_number)
+    # print(">>>>> buildId=" + str(buildId))
     if buildId is None:
         return None
     status = -1
     count = 900
     url = None
     if branch is not None:
-        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/api/json"
+        url = common.jenkinsUrl() + "job/" + folder + '/job/' + job + "/job/" + branch + "/" + str(buildId) + "/api/json"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/api/json"
+        url = common.jenkinsUrl() + "job/" + folder + '/job/' + job + "/" + str(buildId) + "/api/json"
+    # print(">>>>>> waiting: " + url)
     while status != 200 and count >= 0:
         count = count - 1
         resp = requests.get(url)
         status = resp.status_code
         if status == 200:
+            # print(resp.text)
             j = json.loads(resp.text)
             if j['building'] is False:
                 return j
@@ -71,16 +85,17 @@ def waitForBuild(job, branch=None):
     return None
 
 
-def getConsole(job, branch, buildId):
+def getConsole(folder_name, job, branch, buildId):
 
     result = prepareSession()
     session = result['session']
     headers = result['headers']
     url = None
     if branch is not None:
-        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/consoleText"
+        url = common.jenkinsUrl() + "job/" + folder_name + "/job/" + job + "/job/" + branch + "/" + str(buildId) + "/consoleText"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/" + str(buildId) + "/consoleText"
+        url = common.jenkinsUrl() + "job/" + folder_name + "/job/" + job + "/" + str(buildId) + "/consoleText"
+    print("getConsole url=" + url)
     resp = session.get(url, headers=headers)
     if resp.status_code == 200:
         return resp.text
@@ -88,75 +103,79 @@ def getConsole(job, branch, buildId):
         raise Exception("Failed to retrieve console for " + url + ': ' + str(resp.status_code))
 
 
-def getArtifact(job, branch, buildId, relativePath):
-    print(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)
-    resp = requests.get(common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath)
+def getArtifact(folder_name, job, branch, buildId, relativePath):
+    url = common.jenkinsUrl() + "job/" + folder_name + "/job/" + job + "/job/" + branch + "/" + str(buildId) + "/artifact/" + relativePath
+    print(url)
+    resp = requests.get(url)
     if resp.status_code != 200:
         raise Exception("Failed to retrieve artifact " + str(resp.status_code))
     return resp.text
 
 
-def proceed(job, branch, buildId, inputId):
-    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/proceedEmpty"
-    resp = requests.post(url)
-    if resp.status_code != 200:
-        raise Exception("Failed to proceed" + str(resp.status_code))
-    return resp.text
+# def proceed(job, branch, buildId, inputId):
+#     url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/proceedEmpty"
+#     resp = requests.post(url)
+#     if resp.status_code != 200:
+#         raise Exception("Failed to proceed" + str(resp.status_code))
+#     return resp.text
 
 
-def abort(job, branch, buildId, inputId):
-    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/abort"
-    resp = requests.post(url)
-    if resp.status_code != 200:
-        raise Exception("Failed to abort" + str(resp.status_code))
-    return resp.text
+# def abort(job, branch, buildId, inputId):
+#     url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + str(buildId) + "/input/" + inputId + "/abort"
+#     resp = requests.post(url)
+#     if resp.status_code != 200:
+#         raise Exception("Failed to abort" + str(resp.status_code))
+#     return resp.text
 
 
-def waitForBuildToExist(job, branch=None):
+def waitForBuildToExist(folder, job, branch=None, build_number=1):
+    build_number=int(build_number)
     status = -1
     count = 60
     url = None
     if branch is not None:
-        url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/api/json"
+        url = common.jenkinsUrl() + "job/" + folder + '/job/' + job + "/job/" + branch + "/api/json"
     else:
-        url = common.jenkinsUrl() + "job/" + job + "/api/json"
+        url = common.jenkinsUrl() + "job/" + folder + '/job/' + job + "/api/json"
     while status != 200 and count >= 0:
         count = count - 1
         resp = requests.get(url)
         status = resp.status_code
         if status == 200:
+            # print('>>>>response for build check of ' + url)
+            # print(resp.text)
             j = json.loads(resp.text)
-            if len(j['builds']) == 0:
-                status = -1
-                time.sleep(1)
-            else:
-                return j['builds'][0]['number']
+            for b in j['builds']:
+                if b['number'] == build_number:
+                    return b['number']
+        status = -1
+        time.sleep(1)
     return None
 
 
-def scanMultibranchPipeline(job):
+def scanMultibranchPipeline(folder_name, job):
     result = prepareSession()
     session = result['session']
     headers = result['headers']
-    r = session.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0", headers=headers)
+    r = session.post(common.jenkinsUrl() + "job/" + folder_name + "/job/" + job + "/build?delay=0", headers=headers)
     if r.status_code != 200:
         raise Exception("Failed scan multibranch pipeline " + str(r.status_code))
 
 
-def runPipeline(job):
+def runPipeline(folder_name, job):
     result = prepareSession()
     session = result['session']
     headers = result['headers']
-    r = session.post(common.jenkinsUrl() + "job/" + job + "/build?delay=0", headers=headers)
+    r = session.post(common.jenkinsUrl() + "job/" + folder_name + "/job/" + job + "/build?delay=0", headers=headers)
     if r.status_code != 201:
         raise Exception("Failed to run pipeline " + str(r.status_code))
     
 
-def deleteBuild(job, branch="master", number="1"):
+def deleteBuild(folder_name, job, branch="master", number="1"):
     result = prepareSession()
     session = result['session']
     headers = result['headers']
-    url = common.jenkinsUrl() + "job/" + job + "/job/" + branch + "/" + number + "/doDelete"
+    url = common.jenkinsUrl() + "job/" + folder_name, + "/job/" + job + "/job/" + branch + "/" + number + "/doDelete"
     print("delete=" + url)
     r = session.post(url, headers=headers)
     print(r)
@@ -200,6 +219,12 @@ while (Jenkins.getInstance().getAllItems().size() > 0) {
 }
 """
     executeScript(template)
+
+
+# def createFolder(name):
+#     template= '''
+# Jenkins.instance.createProject(com.cloudbees.hudson.plugins.folder.Folder.class, "''' + name + '''")
+# '''    
 
 
 def addEnvVar(name, value):

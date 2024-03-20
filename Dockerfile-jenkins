@@ -2,8 +2,14 @@ FROM jenkins/jenkins:2.401.3-lts
 USER root
 
 RUN apt-get update
-RUN apt-get upgrade ca-certificates -y --allow-unauthenticated libedit-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev 
+RUN apt-get upgrade -y ca-certificates --allow-unauthenticated libedit-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev 
 RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
+
+# Install cisco umbrella certs
+RUN wget http://www.cisco.com/security/pki/certs/ciscoumbrellaroot.cer && \
+    openssl x509 -inform DER -in ciscoumbrellaroot.cer -out ciscoumbrellaroot.crt && \
+    cp ciscoumbrellaroot.crt /usr/local/share/ca-certificates/ciscoumbrellaroot.crt && \
+    update-ca-certificates
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
 RUN groupadd docker

@@ -125,24 +125,29 @@ def aws_put_secrets_manager_string(name, value):
 
 
 def reset_verdaccio():
-    execute("docker compose kill verdaccio")
-    execute("docker compose rm -f verdaccio")
-    execute("docker compose up -d verdaccio")
+    restart('verdaccio')
     checkHealth("verdaccio", "4873", "")
 
 
 def reset_aws():
-    execute("docker compose kill aws")
-    execute("docker compose rm -f aws")
-    execute("docker compose up -d aws")
+    restart('aws')
     checkHealth("aws", "4566")
 
+def reset_git():
+    restart('db')
+    restart('gitea')
+    checkHealth("gitea", "8889", "")
+    execute("docker compose exec --user git gitea gitea admin user create --admin --username root --password admin --email admin@example.com")
+    execute("docker compose exec --user git gitea gitea admin user create --username jenkins_ro --password jenkins_ro --email jenkins_rosts@example.com")
+
+def restart(service):
+    execute("docker compose kill " + service)
+    execute("docker compose rm -f " + service)
+    execute("docker compose up -d " + service)
 
 def reset_nodes():
-    for c in ['jenkins-amd64', 'jenkins-amd64-u22', 'jenkins-graviton-u22', 'custom-node']:
-        execute('docker compose kill ' + c)    
-        execute("docker compose rm -f " + c)
-        execute("docker compose up -d " + c)        
+    for c in ['jenkins-amd64-u22-1', 'jenkins-amd64-u22-2', 'jenkins-graviton-u22', 'custom-node']:
+        restart(c)
 
 
 def gitUrl():

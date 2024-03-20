@@ -18,7 +18,6 @@ services:
       - GITEA__log__FLAGS=date,time,level
       - GITEA__server__ROOT_URL=http://localhost:8889
       - GITEA__server__HTTP_PORT=8889
-    restart: always
     ports:
       - 8889:8889
       - 222:22
@@ -26,7 +25,6 @@ services:
       - db
   db:
     image: postgres:14
-    restart: always
     environment:
       - POSTGRES_USER=gitea
       - POSTGRES_PASSWORD=gitea
@@ -51,7 +49,25 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
     env_file:
       - ../git.env
-  jenkins-amd64:
+  # jenkins-amd64:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile-node
+  #   hostname: docker-node
+  #   depends_on:
+  #     - jenkins
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - jenkins-amd64-workspace-volume:/workspace
+  #   environment:
+  #     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
+  #     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
+  #     AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
+  #     AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
+  #     WORKER_NAME: ec2-worker-u20amd64-medium
+    # env_file:
+    #   - ../git.env
+  jenkins-amd64-u22-1:
     build:
       context: .
       dockerfile: Dockerfile-node
@@ -66,10 +82,10 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-      WORKER_NAME: ec2-worker-u20amd64-medium
+      WORKER_NAME: ec2-worker-u22amd64-medium-1
     env_file:
       - ../git.env
-  jenkins-amd64-u22:
+  jenkins-amd64-u22-2:
     build:
       context: .
       dockerfile: Dockerfile-node
@@ -84,9 +100,9 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-      WORKER_NAME: ec2-worker-u22amd64-medium
+      WORKER_NAME: ec2-worker-u22amd64-medium-2
     env_file:
-      - ../git.env
+      - ../git.env      
   jenkins-graviton-u22:
     build:
       context: .
