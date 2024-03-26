@@ -21,7 +21,7 @@ jenkins:
   - name: "custom"
   nodes:
   - permanent:
-      labelString: "ec2-worker-u22amd64-medium"
+      labelString: "ec2-worker-u22amd64-medium amd64-1"
       numExecutors: 6
       launcher:
         jnlp:

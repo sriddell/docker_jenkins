@@ -49,34 +49,16 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
     env_file:
       - ../git.env
-  # jenkins-amd64:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile-node
-  #   hostname: docker-node
-  #   depends_on:
-  #     - jenkins
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - jenkins-amd64-workspace-volume:/workspace
-  #   environment:
-  #     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
-  #     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
-  #     AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
-  #     AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-  #     WORKER_NAME: ec2-worker-u20amd64-medium
-    # env_file:
-    #   - ../git.env
   jenkins-amd64-u22-1:
     build:
       context: .
       dockerfile: Dockerfile-node
+    privileged: true
     hostname: docker-node
     depends_on:
       - jenkins
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins-amd64-workspace-volume:/workspace
+      - jenkins-amd64-workspace-volume-1:/workspace
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
@@ -89,12 +71,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-node
+    privileged: true
     hostname: docker-node
     depends_on:
       - jenkins
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - jenkins-amd64-workspace-volume:/workspace
+      - jenkins-amd64-workspace-volume-2:/workspace
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
@@ -107,29 +89,29 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-node
+    privileged: true
     hostname: docker-node
     depends_on:
       - jenkins
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - jenkins-graviton-workspace-volume:/workspace
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-""}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-""}
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
-      WORKER_NAME: ec2-worker-u22arm-medium
+      WORKER_NAME: ec2-worker-u22arm-medium amd64-1
     env_file:
       - ../git.env
   custom-node:
     build:
       context: .
       dockerfile: Dockerfile-node
+    privileged: true
     hostname: docker-node
     depends_on:
       - jenkins
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - jenkins-graviton-workspace-volume:/workspace
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-""}
@@ -165,6 +147,10 @@ services:
       - 8082:80
 volumes:
   jenkins-workspace-volume: null
-  jenkins-graviton-workspace-volume: null
-  jenkins-amd64-workspace-volume: null
+  jenkins-graviton-workspace-volume: 
+    name: jenkins-graviton-1
+  jenkins-amd64-workspace-volume-1: 
+    name: jenkins-amd64-1
+  jenkins-amd64-workspace-volume-2: 
+    name: jenkins-amd64-2
   gitea-volume: null

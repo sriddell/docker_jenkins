@@ -3,7 +3,7 @@ USER root
 
 RUN apt-get update
 RUN apt-get upgrade -y ca-certificates --allow-unauthenticated libedit-dev build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev 
-RUN apt-get -y install wget sudo uuid jq python3-pip python-dev build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
+RUN apt-get -y install wget sudo uuid jq python3-pip python-dev-is-python3 build-essential libtap-formatter-junit-perl zip uuid-runtime rsync net-tools
 
 # Install cisco umbrella certs
 RUN wget http://www.cisco.com/security/pki/certs/ciscoumbrellaroot.cer && \
