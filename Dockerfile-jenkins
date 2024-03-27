@@ -31,7 +31,7 @@ RUN docker buildx version
 # which is a VOLUME in the parent image so downstream builds can't modify it.
 # So we will move the jenkins.sh to a backup, and then add a new jenkins.sh script that
 #installs the plugins at startup, then invokes the original startup script.
-ARG CACHEBUST=1
+
 RUN mv /usr/local/bin/jenkins.sh /usr/local/bin/jenkins_orig.sh
 COPY ./startup.sh /usr/local/bin/jenkins.sh
 RUN chmod +x /usr/local/bin/jenkins.sh
@@ -40,11 +40,6 @@ RUN chmod +x /usr/local/bin/jenkins.sh
 RUN usermod -a -G docker jenkins
 RUN usermod -a -G users jenkins
 
-COPY ./jenkins/artifactory_plugin.xml /tmp/artifactory_plugin.xml
-ARG DOCKER_HOST_ADDR
-RUN echo $DOCKER_HOST_ADDR
-RUN sed -i "s/DOCKER_HOST_ADDR/$DOCKER_HOST_ADDR/g" /tmp/artifactory_plugin.xml
-RUN chown jenkins:jenkins /tmp/artifactory_plugin.xml
 RUN mkdir /casc_configs
 RUN chown jenkins:jenkins /casc_configs
 ENV CASC_JENKINS_CONFIG=/casc_configs
@@ -63,6 +58,14 @@ ENV JENKINS_UC https://updates.jenkins.io
 
 RUN chown jenkins:jenkins /casc_configs
 
+ARG CACHEBUST=1
+USER root
+COPY ./jenkins/artifactory_plugin.xml /tmp/artifactory_plugin.xml
+ARG DOCKER_HOST_ADDR
+RUN echo $DOCKER_HOST_ADDR
+RUN sed -i "s/DOCKER_HOST_ADDR/$DOCKER_HOST_ADDR/g" /tmp/artifactory_plugin.xml
+RUN chown jenkins:jenkins /tmp/artifactory_plugin.xml
+USER jenkins
 
 # Skip initial setup
 ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.LAUNCH_DIAGNOSTICS=true
