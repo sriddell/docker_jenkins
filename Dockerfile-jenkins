@@ -9,6 +9,7 @@ RUN apt-get -y install wget sudo uuid jq python3-pip python-dev-is-python3 build
 RUN wget http://www.cisco.com/security/pki/certs/ciscoumbrellaroot.cer && \
     openssl x509 -inform DER -in ciscoumbrellaroot.cer -out ciscoumbrellaroot.crt && \
     cp ciscoumbrellaroot.crt /usr/local/share/ca-certificates/ciscoumbrellaroot.crt && \
+    chmod 644 /usr/local/share/ca-certificates/ciscoumbrellaroot.crt  && \
     update-ca-certificates
 
 RUN echo 'jenkins ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/jenkins
