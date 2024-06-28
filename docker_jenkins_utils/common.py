@@ -17,16 +17,20 @@ def checkHealth(service, port="3000", path="/health"):
     sys.stdout.flush()
     maxRetries = 40
     while not healthy and count < maxRetries:
+        last_status = None
         time.sleep(min(5, count))
         count = count + 1
         try:
             r = requests.get(url)
             if r.status_code == 200 or r.status_code == 204 or r.status_code == 403:
                 healthy = True
+            else:
+                last_status = r.status_code
         except requests.ConnectionError:
+            last_status = "connection error"
             pass
         if not healthy and count < maxRetries:
-            print("...not healthy, waiting " + str(min(5, count)) + " seconds to try again; " + str(maxRetries - count) + " tries left")
+            print("...not healthy (status " + str(last_status) + "), waiting " + str(min(5, count)) + " seconds to try again; " + str(maxRetries - count) + " tries left")
             sys.stdout.flush()
     if not healthy:
         print("Service " + service + " failed to become healthy")
