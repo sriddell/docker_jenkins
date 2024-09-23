@@ -179,7 +179,6 @@ def deleteBuild(folder_name, job, branch="master", number="1"):
     url = common.jenkinsUrl() + "job/" + folder_name, + "/job/" + job + "/job/" + branch + "/" + number + "/doDelete"
     print("delete=" + url)
     r = session.post(url, headers=headers)
-    print(r)
     if r.status_code != 200:
         raise Exception("Failed to delete build " + str(r.status_code))
 
