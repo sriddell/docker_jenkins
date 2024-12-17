@@ -1,27 +1,25 @@
 import docker_jenkins_utils.gitea_common as git
 import os
 import shutil
-from docker_jenkins_utils.common import getGitInfo
+from docker_jenkins_utils.common import getGitServer
 import subprocess
 
 
-def createRepo(name):
-    git.createRepo(name)
-    return getGitInfo()['baseUrlWithCreds'] + "/" + name + ".git"
 
 def createAndLoadRepo(repoName, src, branch="master", tag=None):
-    git.createRepo(repoName)
+    url = getGitServer().createRepo(repoName)
     execute(["git", "init"], src)
     execute(["git", "checkout", "-b", branch], src)
     execute(["git", "add", "."], src)
     execute(["git", "commit", "-am", "'init'"], src)
-    url = getGitInfo()['baseUrlWithCreds'] + "/" + repoName + ".git"
+    print('>>>>>>>>>>>>>>')
+    print(url)
     execute(["git", "remote", "add", "origin", url], src)
     execute(["git", "push", "origin", branch], src)
     if tag is not None:
         execute(["git", "tag", tag], src)
         execute(["git", "push", "origin", tag], src)
-    return getGitInfo()['baseUrl'] + "/" + repoName + ".git"
+    return url
 
 
 def cloneRepo(url, targetDir):

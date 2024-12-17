@@ -4,6 +4,7 @@ import requests
 import os
 import time
 import boto3
+from requests.auth import HTTPBasicAuth
 
 DOCKER_HOST_ADDR = None
 
@@ -54,21 +55,25 @@ def check_output(*args, **kwargs):
 
 def getDockerHostAddr():
     global DOCKER_HOST_ADDR
-    if DOCKER_HOST_ADDR is None:
-        DOCKER_HOST_ADDR = os.environ.get('DOCKER_HOST_ADDR')
-        if DOCKER_HOST_ADDR is None:
-            try:
-                output = check_output(["docker-machine", "active"]).strip()
-                DOCKER_HOST_ADDR = check_output(["docker-machine", "ip", output]).strip()
-            except (OSError, subprocess.CalledProcessError):
-                # We will reach this branch if the "docker-machine" command does not
-                # exist or if "docker-machine active" exits with an error status
-                import socket
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                s.connect(("8.8.8.8", 53))
-                addr = s.getsockname()[0]
-                s.close()
-                DOCKER_HOST_ADDR = addr
+    if 'DOCKER_HOST_ADDR' in os.environ:
+        DOCKER_HOST_ADDR = os.environ['DOCKER_HOST_ADDR']
+    else:
+        DOCKER_HOST_ADDR = '127.0.0.1'
+    # if DOCKER_HOST_ADDR is None:
+    #     DOCKER_HOST_ADDR = os.environ.get('DOCKER_HOST_ADDR')
+    #     if DOCKER_HOST_ADDR is None:
+    #         try:
+    #             output = check_output(["docker-machine", "active"]).strip()
+    #             DOCKER_HOST_ADDR = check_output(["docker-machine", "ip", output]).strip()
+    #         except (OSError, subprocess.CalledProcessError):
+    #             # We will reach this branch if the "docker-machine" command does not
+    #             # exist or if "docker-machine active" exits with an error status
+    #             import socket
+    #             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    #             s.connect(("8.8.8.8", 53))
+    #             addr = s.getsockname()[0]
+    #             s.close()
+    #             DOCKER_HOST_ADDR = addr
     return DOCKER_HOST_ADDR
 
 
@@ -135,7 +140,7 @@ def reset_verdaccio():
 
 def reset_aws():
     restart('aws')
-    checkHealth("aws", "4566")
+    checkHealth("aws", "4566", path="/_localstack/health")
 
 def reset_git():
     restart('db')
@@ -154,16 +159,16 @@ def reset_nodes():
         restart(c)
 
 
-def gitUrl():
-    url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
-    return url
+# def gitUrl():
+#     url = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
+#     return url
 
 
-def getGitInfo():
-    info = {}
-    info['baseUrlWithCreds'] = "http://root:admin@" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
-    info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
-    return info
+# def getGitInfo():
+#     info = {}
+#     info['baseUrlWithCreds'] = "http://root:admin@" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
+#     info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
+#     return info
 
 
 def jenkinsUrl():
@@ -176,3 +181,53 @@ def verdaccioUrl():
 
 def awsEndpointUrl():
     return "http://" + getDockerHostAddr() + ":" + getContainerPort("aws", 4566)
+
+def getGitServer():
+    return GitServer()
+
+class GitServer:
+    def externalGitApi(self):
+        return "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/api/v1/"
+    
+    def externalGitUrl(self, repo):
+        return "http://root:admin@" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root" + "/" + repo + ".git"
+    
+    def internalGitUrl(self, repo):
+        return "http://gitea:8889/root/" + repo + ".git"
+
+    def createRepo(self, name):
+        url = self.externalGitApi() + "user/repos"
+        payload = '''{
+            "auto_init": false,
+            "default_branch": "master",
+            "name": "''' + name + '''",
+            "private": false,
+            "trust_model": "default"
+        }'''
+        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        resp = requests.post(url=url, headers=headers, auth=self.getBasicAuth(), data=payload)
+        if resp.status_code != 201:
+            raise Exception("createRepo:" + str(resp.status_code) + ' ' + resp.text)   
+        url = self.externalGitUrl(name)
+        print('>>>>>>>>' + url)
+        return url
+    
+    def addSshKey(self, key, repo):
+        url = self.externalGitApi() + "repos/root/" + repo + "/keys"
+        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
+        payload = '''{
+            "key": "''' + key + '''",
+            "read_only": false,
+            "title": "gitops"
+        }'''
+        resp = requests.post(url=url, headers=headers, auth=self.getBasicAuth(), data=payload)
+        if resp.status_code != 201:
+            raise Exception("addSshKey:" + str(resp.status_code) + ' ' + resp.text)    
+        
+    def getBasicAuth(self):
+        return HTTPBasicAuth('root', 'admin')
+    # def externalGitInfo():
+    #     info = {}
+    #     info['baseUrlWithCreds'] = 
+    #     info['baseUrl'] = "http://" + getDockerHostAddr() + ":" + getContainerPort("gitea", 8889) + "/root"
+    #     return info

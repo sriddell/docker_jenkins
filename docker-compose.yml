@@ -22,12 +22,18 @@ services:
       - 222:22
     depends_on:
       - db
+    networks:
+      - jenkins
+
   db:
     image: postgres:14
     environment:
       - POSTGRES_USER=gitea
       - POSTGRES_PASSWORD=gitea
       - POSTGRES_DB=gitea
+    networks:
+      - jenkins
+
   jenkins:
     build:
       context: .
@@ -36,6 +42,7 @@ services:
         CACHEBUST: 2
     depends_on:
       - gitea
+      - aws
     ports:
       - 8080:8080
       - 50000:50000
@@ -48,6 +55,9 @@ services:
       AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-""}
     env_file:
       - ../git.env
+    networks:
+      - jenkins
+
   jenkins-amd64-u22-1:
     build:
       context: .
@@ -66,6 +76,9 @@ services:
       WORKER_NAME: ec2-worker-u22amd64-medium-1
     env_file:
       - ../git.env
+    networks:
+      - jenkins
+
   jenkins-amd64-u22-2:
     build:
       context: .
@@ -84,6 +97,9 @@ services:
       WORKER_NAME: ec2-worker-u22amd64-medium-2
     env_file:
       - ../git.env      
+    networks:
+      - jenkins
+
   jenkins-graviton-u22:
     build:
       context: .
@@ -102,6 +118,9 @@ services:
       WORKER_NAME: ec2-worker-u22arm-medium
     env_file:
       - ../git.env
+    networks:
+      - jenkins
+
   custom-node:
     build:
       context: .
@@ -120,30 +139,48 @@ services:
       WORKER_NAME: custom
     env_file:
       - ../git.env  
+    networks:
+      - jenkins
+
   verdaccio:
     build:
       context: .
       dockerfile: Dockerfile-verdaccio
     ports:
       - 4873:4873
+    networks:
+      - jenkins
+
   artifactory:
     image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.46.11
     environment:
       SKIP_VALIDATION_DISK_SPACE: "true"
     ports:
       - 8081:8081
+    networks:
+      - jenkins
+
   aws:
-    image: localstack/localstack:1.4
+    hostname: aws
+    image: localstack/localstack:4
     environment:
       - SERVICES=s3,ssm,sqs,secretsmanager
     ports:
       - 4566:4566
+    networks:
+      jenkins:
+        aliases:
+          - aws
+
   kubeconfig-server:
     build:
       context: .
       dockerfile: Dockerfile-kubeconfig
     ports:
       - 8082:80
+    networks:
+      - jenkins
+            
 volumes:
   jenkins-workspace-volume: null
   jenkins-graviton-workspace-volume: 
@@ -153,3 +190,7 @@ volumes:
   jenkins-amd64-workspace-volume-2: 
     name: jenkins-amd64-2
   gitea-volume: null
+
+networks:
+  jenkins:
+    driver: bridge  
