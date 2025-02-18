@@ -5,6 +5,5 @@ docker compose kill jenkins-amd64-u22-1 && docker compose rm -f jenkins-amd64-u2
 docker compose kill jenkins-amd64-u22-2 && docker compose rm -f jenkins-amd64-u22-2
 docker compose kill jenkins-graviton-u22 && docker compose rm -f jenkins-graviton-u22
 docker compose kill custom-node && docker compose rm -f custom-node
-docker compose kill db && docker compose rm -f db
 docker compose kill gitea && docker compose rm -f gitea
 ./up

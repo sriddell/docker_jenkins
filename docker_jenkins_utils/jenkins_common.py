@@ -227,8 +227,8 @@ while (Jenkins.getInstance().getAllItems().size() > 0) {
 # '''    
 
 
-def addEnvVar(name, value):
-    template = """
+def addEnvVars(values):
+    s = '''
 import hudson.slaves.EnvironmentVariablesNodeProperty
 import jenkins.model.Jenkins
 
@@ -239,19 +239,21 @@ envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodePr
 newEnvVarsNodeProperty = null
 envVars = null
 
-if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {{
+if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
   newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
   globalNodeProperties.add(newEnvVarsNodeProperty)
   envVars = newEnvVarsNodeProperty.getEnvVars()
-}} else {{
+} else {
   envVars = envVarsNodePropertyList.get(0).getEnvVars()
-}}
+}
+'''
+    for k, v in values.items():
+        s += 'envVars.put("' + k + '", "' + v + '")\n'
 
-envVars.put("{0}", "{1}")
-
-instance.save()
-"""
-    executeScript(template.format(name, value))
+    s += '''
+    instance.save()
+    '''
+    executeScript(s)
 
 
 def clearEnvVars():
@@ -281,11 +283,20 @@ instance.save()
     executeScript(template)
 
 
-def addSecuritySignature(sig):
-    thisDir = os.path.dirname(os.path.abspath(__file__))
-    j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
-    script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
-    executeScript(script)
+def addSecuritySignatures(sigs):
+    s = '''import org.jenkinsci.plugins.scriptsecurity.scripts.*
+    ScriptApproval.PendingSignature s = null
+    ScriptApproval sa = null
+'''
+    for sig in sigs:
+        s = s + '''
+ signature = "''' + sig + '''"
+ s = new ScriptApproval.PendingSignature(signature, false, ApprovalContext.create())
+
+  sa = ScriptApproval.get();
+  sa.approveSignature(s.signature);
+'''
+    executeScript(s)
 
 
 def executeScript(script):
@@ -293,6 +304,7 @@ def executeScript(script):
     session = result['session']
     headers = result['headers']
     headers.update({"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"})
+    print('executing jenkins script using ' + common.jenkinsUrl())
     r = session.post(common.jenkinsUrl() + "scriptText", data={'script': script}, headers=headers)
 
     if r.status_code != 200:

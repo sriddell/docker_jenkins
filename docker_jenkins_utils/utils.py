@@ -19,6 +19,7 @@ def createAndLoadRepo(repoName, src, branch="master", tag=None):
     if tag is not None:
         execute(["git", "tag", tag], src)
         execute(["git", "push", "origin", tag], src)
+    print('repo created and loaded ' + url)
     return url
 
 

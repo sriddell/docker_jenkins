@@ -143,7 +143,6 @@ def reset_aws():
     checkHealth("aws", "4566", path="/_localstack/health")
 
 def reset_git():
-    restart('db')
     restart('gitea')
     checkHealth("gitea", "8889", "")
     execute("docker compose exec --user git gitea gitea admin user create --admin --username root --password admin --email admin@example.com")

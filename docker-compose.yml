@@ -1,38 +1,35 @@
 ---
 services:
   gitea:
-    image: gitea/gitea:1.23.3
+    image: gitea/gitea:1.16.7
     container_name: gitea
     environment:
       - GITEA__security__INSTALL_LOCK=true
       - USER_UID=1000
       - USER_GID=1000
       - GITEA__mailer__ENABLED=false
-      - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=db:5432
-      - GITEA__database__NAME=gitea
-      - GITEA__database__USER=gitea
-      - GITEA__database__PASSWD=gitea
-      - GITEA__log__LEVEL=Trace
+      - GITEA__log__LEVEL=Error
       - GITEA__log__FLAGS=date,time,level
       - GITEA__server__ROOT_URL=http://localhost:8889
       - GITEA__server__HTTP_PORT=8889
+      - GITEA_server_ENABLE_FEDERATED_AVATAR=false
+      - GITEA_server_DISABLE_GRAVATAR=true
     ports:
       - 8889:8889
       - 222:22
-    depends_on:
-      - db
+    # volumes:
+    #   - gitea-volume:/data      
     networks:
       - jenkins
 
-  db:
-    image: postgres:14
-    environment:
-      - POSTGRES_USER=gitea
-      - POSTGRES_PASSWORD=gitea
-      - POSTGRES_DB=gitea
-    networks:
-      - jenkins
+  # db:
+  #   image: postgres:14
+  #   environment:
+  #     - POSTGRES_USER=gitea
+  #     - POSTGRES_PASSWORD=gitea
+  #     - POSTGRES_DB=gitea
+  #   networks:
+  #     - jenkins
 
   jenkins:
     build:
