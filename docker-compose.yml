@@ -152,11 +152,13 @@ services:
       - jenkins
 
   artifactory:
-    image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.104.7
-    environment:
-      SKIP_VALIDATION_DISK_SPACE: "true"
+    # image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.98.15
+    image: releases-docker.jfrog.io/jfrog/artifactory-oss:7.46.11
+    # environment:
+    #   SKIP_VALIDATION_DISK_SPACE: "true"
     ports:
       - 8081:8081
+      # - 8082:8082
     networks:
       - jenkins
 

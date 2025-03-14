@@ -239,19 +239,48 @@ envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodePr
 newEnvVarsNodeProperty = null
 envVars = null
 
-if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {{
+if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
   newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
   globalNodeProperties.add(newEnvVarsNodeProperty)
   envVars = newEnvVarsNodeProperty.getEnvVars()
-}} else {{
+} else {
   envVars = envVarsNodePropertyList.get(0).getEnvVars()
-}}
+}
 
 envVars.put("{0}", "{1}")
 
 instance.save()
 """
     executeScript(template.format(name, value))
+
+def addEnvVars(dict):
+    script = '''
+import hudson.slaves.EnvironmentVariablesNodeProperty
+import jenkins.model.Jenkins
+
+instance = Jenkins.getInstance()
+globalNodeProperties = instance.getGlobalNodeProperties()
+envVarsNodePropertyList = globalNodeProperties.getAll(EnvironmentVariablesNodeProperty.class)
+
+newEnvVarsNodeProperty = null
+envVars = null
+
+if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
+  newEnvVarsNodeProperty = new EnvironmentVariablesNodeProperty();
+  globalNodeProperties.add(newEnvVarsNodeProperty)
+  envVars = newEnvVarsNodeProperty.getEnvVars()
+} else {
+  envVars = envVarsNodePropertyList.get(0).getEnvVars()
+}'''
+
+    for k, v in dict.items():
+        script += '''\n
+        envVars.put("''' + k + '''", "''' + v + '''")'''
+
+    script += '''
+    instance.save()
+    '''
+    executeScript(script)    
 
 
 def clearEnvVars():
@@ -282,10 +311,40 @@ instance.save()
 
 
 def addSecuritySignature(sig):
-    thisDir = os.path.dirname(os.path.abspath(__file__))
-    j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
-    script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
+    # thisDir = os.path.dirname(os.path.abspath(__file__))
+    # j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
+    # script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
+    script = '''' \
+    import org.jenkinsci.plugins.scriptsecurity.scripts.*
+signature = "''' + sig + '''"
+ScriptApproval.PendingSignature s = new ScriptApproval.PendingSignature(signature, false, ApprovalContext.create())
+
+ScriptApproval sa = ScriptApproval.get();
+sa.approveSignature(s.signature);'''
     executeScript(script)
+
+
+def addSecuritySignatures(sigs):
+    # thisDir = os.path.dirname(os.path.abspath(__file__))
+    # j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
+    # script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
+    script = ''' 
+    import org.jenkinsci.plugins.scriptsecurity.scripts.*
+    ScriptApproval.PendingSignature s = null
+    ScriptApproval sa = null
+    '''
+    for sig in sigs:
+        script += '''\n
+signature = "''' + sig + '''"
+s = new ScriptApproval.PendingSignature(signature, false, ApprovalContext.create())
+
+sa = ScriptApproval.get();
+sa.approveSignature(s.signature);'''
+    print("::::::::::::::::::::::::")
+    print(script)
+    print("::::::::::::::::::::::::")
+    executeScript(script)
+    
 
 
 def executeScript(script):
