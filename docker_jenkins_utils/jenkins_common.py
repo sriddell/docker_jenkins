@@ -311,14 +311,8 @@ def addSecuritySignature(sig):
     # thisDir = os.path.dirname(os.path.abspath(__file__))
     # j2 = Environment(loader=FileSystemLoader(thisDir), trim_blocks=True)
     # script = j2.get_template('templates/addSecuritySignature.groovy').render(signature=sig)
-    script = '''' \
-    import org.jenkinsci.plugins.scriptsecurity.scripts.*
-signature = "''' + sig + '''"
-ScriptApproval.PendingSignature s = new ScriptApproval.PendingSignature(signature, false, ApprovalContext.create())
-
-ScriptApproval sa = ScriptApproval.get();
-sa.approveSignature(s.signature);'''
-    executeScript(script)
+    sigs = [sig]
+    addSecuritySignatures(sigs)
 
 
 def addSecuritySignatures(sigs):
