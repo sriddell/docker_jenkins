@@ -224,6 +224,26 @@ class GitServer:
         if resp.status_code != 201:
             raise Exception("addSshKey:" + str(resp.status_code) + ' ' + resp.text)    
         
+    def getRepos(self):
+        url = self.externalGitApi()
+        headers = {'accept': 'application/json'}
+        url = url + "repos/search"
+        resp = requests.get(url, auth=self.getBasicAuth(), headers=headers)
+        if resp.status_code != 200:
+            raise Exception("getRepos:" + str(resp.status_code) + ' ' + resp.text)
+        return resp.json()
+
+
+    def deleteRepos(self):
+        repos = self.getRepos()
+        for repo in repos['data']:
+            url = self.externalGitApi()
+            url = url + "repos/" + str(repo['owner']['login']) + '/' + repo['name']
+            headers = {'accept': 'application/json'}
+            resp = requests.delete(url, auth=self.getBasicAuth(), headers=headers)
+            if resp.status_code != 204:
+                raise Exception("deleteRepos:" + str(resp.status_code) + ' ' + resp.text)        
+        
     def getBasicAuth(self):
         return HTTPBasicAuth('root', 'admin')
     # def externalGitInfo():

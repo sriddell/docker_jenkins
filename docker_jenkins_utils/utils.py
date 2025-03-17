@@ -19,7 +19,7 @@ def createAndLoadRepo(repoName, src, branch="master", tag=None):
     if tag is not None:
         execute(["git", "tag", tag], src)
         execute(["git", "push", "origin", tag], src)
-    return url
+    return getGitServer().internalGitUrl(repoName)
 
 
 def cloneRepo(url, targetDir):

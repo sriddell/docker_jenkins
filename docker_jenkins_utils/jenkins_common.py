@@ -19,17 +19,14 @@ def addJob(folder_name, job_name, repoUrl):
     content = j2.get_template('templates/config.xml').render(name=job_name, repo_url=repoUrl)
     headers.update({"Content-Type": "text/xml; charset=UTF-8"})
     url = common.jenkinsUrl() + 'job/' + folder_name + '/createItem?name=' + job_name
+    print("::::::::: " + url )
     r = session.post(url, data=content, headers=headers)
     if r.status_code != 200:
         raise Exception("Failed to add job; status was " + str(r.status_code))
 
 def createFolder(name):
-    try:
-        server = jenkins.Jenkins(common.jenkinsUrl(), username='admin', password='admin')
-        server.create_job(name, jenkins.EMPTY_FOLDER_XML)
-    except jenkins.JenkinsException as e:
-        print("Have jenkins exception")
-        print(e)
+    server = jenkins.Jenkins(common.jenkinsUrl(), username='admin', password='admin')
+    server.create_job(name, jenkins.EMPTY_FOLDER_XML)
 
 
 def addPipelineJob(folder_name, job_name, repoUrl, directory):
@@ -228,7 +225,7 @@ while (Jenkins.getInstance().getAllItems().size() > 0) {
 
 
 def addEnvVar(name, value):
-    template = """
+    template = '''
 import hudson.slaves.EnvironmentVariablesNodeProperty
 import jenkins.model.Jenkins
 
@@ -247,11 +244,11 @@ if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0 ) {
   envVars = envVarsNodePropertyList.get(0).getEnvVars()
 }
 
-envVars.put("{0}", "{1}")
+envVars.put("''' + name + '''", "''' + value + '''")
 
 instance.save()
-"""
-    executeScript(template.format(name, value))
+'''
+    executeScript(template)
 
 def addEnvVars(dict):
     script = '''
