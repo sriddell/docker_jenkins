@@ -1,4 +1,4 @@
-import docker_jenkins_utils.gitea_common as git
+from docker_jenkins_utils.common import getGitServer
 import os
 import shutil
 from docker_jenkins_utils.common import getGitServer

@@ -8,7 +8,7 @@
 #
 import docker_jenkins_utils.jenkins_common as jenkins
 import docker_jenkins_utils.utils as test_utils
-import docker_jenkins_utils.gitea_common as git
+import docker_jenkins_utils.common as common
 import shutil
 import os
 import sys
@@ -21,7 +21,7 @@ tmpdir = os.path.dirname(os.path.realpath(__file__)) + '/tmp'
 if os.path.exists(tmpdir):
     shutil.rmtree(tmpdir)
     os.mkdir(tmpdir)
-git.deleteRepos()
+common.getGitServer().deleteRepos()
 jenkins.clearAll()
 
 for key in env:
